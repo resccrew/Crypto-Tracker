@@ -11,7 +11,7 @@ public class RegisterViewModel : INotifyPropertyChanged
     private string _password = "";
     private string _confirmPassword = "";
     private string _error = "";
-
+    private readonly DatabaseService _db = new DatabaseService();
     public string Email { get => _email; set => SetProperty(ref _email, value); }
     public string Password { get => _password; set => SetProperty(ref _password, value); }
     public string ConfirmPassword { get => _confirmPassword; set => SetProperty(ref _confirmPassword, value); }
@@ -28,6 +28,7 @@ public class RegisterViewModel : INotifyPropertyChanged
         RegisterCommand = new RelayCommand(() =>
         {
             Error = "";
+
 
             if (string.IsNullOrWhiteSpace(Email))
             {
@@ -47,8 +48,20 @@ public class RegisterViewModel : INotifyPropertyChanged
                 return;
             }
 
-            // Поки без БД
-            RegisterSucceeded?.Invoke();
+            if (_db.UserExists(Email))
+            {
+                Error = "Користувач з таким email вже існує.";
+                return;
+            }
+            
+            if (_db.RegisterUser(Email, Password))
+            {
+                RegisterSucceeded?.Invoke();
+            }
+            else
+            {
+                Error = "Користувач з таким email вже існує.";
+            }
         });
 
         BackToLoginCommand = new RelayCommand(() =>
