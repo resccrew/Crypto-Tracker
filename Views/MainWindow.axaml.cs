@@ -8,6 +8,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = new MainWindowViewModel(); // Это связывает код и дизайн
+        // Ми створюємо ViewModel тут, щоб поєднати інтерфейс і логіку
+        DataContext = new MainWindowViewModel();
     }
 }

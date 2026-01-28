@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Desktop_Crypto_Portfolio_Tracker.ViewModels;
-using Desktop_Crypto_Portfolio_Tracker.Views;
+using Desktop_Crypto_Portfolio_Tracker.Views; // Цей рядок обов'язковий!
 
 namespace Desktop_Crypto_Portfolio_Tracker;
 
@@ -17,7 +17,10 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            desktop.MainWindow = new MainWindow
+            {
+                DataContext = new MainWindowViewModel(),
+            };
         }
 
         base.OnFrameworkInitializationCompleted();
