@@ -1,6 +1,13 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.VisualTree; // Нужно для поиска родительского окна
+using Avalonia.Platform.Storage;
+using Avalonia.VisualTree;
+using Desktop_Crypto_Portfolio_Tracker.ViewModels;
+using System.Linq;
+using System;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace Desktop_Crypto_Portfolio_Tracker.Views
 {
@@ -9,19 +16,142 @@ namespace Desktop_Crypto_Portfolio_Tracker.Views
         public PortfolioView()
         {
             InitializeComponent();
+            QuestPDF.Settings.License = LicenseType.Community;
         }
 
         private async void OnAddTransactionClick(object? sender, RoutedEventArgs e)
         {
-            var dialog = new AddTransactionWindow();
-            
-            // Находим родительское окно, так как UserControl сам не является окном
-            var topLevel = TopLevel.GetTopLevel(this) as Window;
-            
-            if (topLevel != null)
+            if (DataContext is MainWindowViewModel viewModel)
             {
-                await dialog.ShowDialog(topLevel);
+                var availableCoins = viewModel.MarketCoins.ToList();
+                var dialog = new AddTransactionWindow(availableCoins);
+                var topLevel = TopLevel.GetTopLevel(this) as Window;
+                
+                if (topLevel != null)
+                {
+                    var result = await dialog.ShowDialog<PortfolioDisplayItem>(topLevel);
+                    if (result != null)
+                    {
+                        viewModel.MyPortfolio.Add(result);
+                        viewModel.RecalculateBalance();
+                    }
+                }
             }
+        }
+
+        private void OnDeleteClick(object? sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && 
+                button.DataContext is PortfolioDisplayItem itemToDelete &&
+                DataContext is MainWindowViewModel viewModel)
+            {
+                viewModel.MyPortfolio.Remove(itemToDelete);
+                viewModel.RecalculateBalance();
+            }
+        }
+
+        private async void OnPrintClick(object? sender, RoutedEventArgs e)
+        {
+            if (DataContext is not MainWindowViewModel viewModel) return;
+
+            var topLevel = TopLevel.GetTopLevel(this);
+            if (topLevel == null) return;
+
+            var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                Title = "Save Portfolio PDF",
+                DefaultExtension = "pdf",
+                SuggestedFileName = $"Portfolio_Report_{DateTime.Now:yyyy-MM-dd}",
+                FileTypeChoices = new[]
+                {
+                    new FilePickerFileType("PDF Document") { Patterns = new[] { "*.pdf" } }
+                }
+            });
+
+            if (file is not null)
+            {
+                string filePath = file.Path.LocalPath;
+                GeneratePdf(filePath, viewModel);
+            }
+        }
+
+        private void GeneratePdf(string filePath, MainWindowViewModel viewModel)
+        {
+            Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    page.Size(PageSizes.A4);
+                    page.Margin(2, Unit.Centimetre);
+                    page.PageColor(Colors.White);
+                    page.DefaultTextStyle(x => x.FontSize(12));
+
+                    // --- ЗАГОЛОВОК ---
+                    page.Header()
+                        .Text("Crypto Portfolio Report")
+                        .SemiBold().FontSize(24).FontColor(Colors.Blue.Medium);
+
+                    // --- ВМІСТ ---
+                    page.Content()
+                        .PaddingVertical(1, Unit.Centimetre)
+                        .Column(x =>
+                        {
+                            x.Item().Text($"Date: {DateTime.Now:g}");
+                            x.Item().Text($"Total Balance: {viewModel.TotalBalance:C2}").Bold().FontSize(16).FontColor(Colors.Green.Medium);
+                            
+                            // 👇 ТУТ БУЛА ПОМИЛКА. ЗАМІНИВ НА Colors.Grey.Lighten2
+                            x.Item().PaddingVertical(10).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+
+                            // Таблиця
+                            x.Item().Table(table =>
+                            {
+                                table.ColumnsDefinition(columns =>
+                                {
+                                    columns.RelativeColumn(); 
+                                    columns.ConstantColumn(80); 
+                                    columns.ConstantColumn(80); 
+                                    columns.ConstantColumn(100); 
+                                });
+
+                                table.Header(header =>
+                                {
+                                    header.Cell().Element(CellStyle).Text("Asset");
+                                    header.Cell().Element(CellStyle).Text("Price");
+                                    header.Cell().Element(CellStyle).Text("Amount");
+                                    header.Cell().Element(CellStyle).Text("Total Value");
+
+                                    static IContainer CellStyle(IContainer container)
+                                    {
+                                        return container.DefaultTextStyle(x => x.SemiBold()).PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
+                                    }
+                                });
+
+                                foreach (var item in viewModel.MyPortfolio)
+                                {
+                                    table.Cell().Element(CellStyle).Text(item.Name ?? "Unknown");
+                                    table.Cell().Element(CellStyle).Text($"{item.Price:C2}");
+                                    table.Cell().Element(CellStyle).Text($"{item.Amount}");
+                                    table.Cell().Element(CellStyle).Text($"{item.TotalValue:C2}");
+
+                                    static IContainer CellStyle(IContainer container)
+                                    {
+                                        return container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+                                    }
+                                }
+                            });
+                        });
+
+                    // --- ФУТЕР ---
+                    page.Footer()
+                        .AlignCenter()
+                        .Text(x =>
+                        {
+                            x.Span("Page ");
+                            x.CurrentPageNumber();
+                        });
+                });
+            })
+            .GeneratePdf(filePath);
         }
     }
 }

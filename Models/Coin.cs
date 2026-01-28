@@ -22,5 +22,8 @@ public class Coin
     [JsonPropertyName("price_change_percentage_24h")]
     public double Change24h { get; set; }
 
+    [JsonPropertyName("image")]
+    public string? ImageUrl { get; set; }
+
     public string UpperSymbol => Symbol?.ToUpper() ?? "";
 }
