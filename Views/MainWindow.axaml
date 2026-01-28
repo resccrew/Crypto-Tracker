@@ -45,8 +45,9 @@
                             <TextBlock Text="$ 62,500.00" FontSize="36" FontWeight="Bold" Foreground="#4CAF50"/>
                         </StackPanel>
                         <Button Grid.Column="1" Content="+ Add Transaction" 
-                                Background="#007ACC" Foreground="White" 
-                                FontSize="14" Padding="20,10" VerticalAlignment="Center"/>
+                            Click="OnAddTransactionClick" 
+                            Background="#007ACC" Foreground="White" 
+                            FontSize="14" Padding="20,10" VerticalAlignment="Center"/>
                     </Grid>
                 </Border>
 

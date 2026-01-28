@@ -19,7 +19,6 @@ public class MainWindowViewModel
     {
         _coinService = new CoinGeckoService();
         _ = LoadMarketDataAsync();
-        LoadDummyPortfolio();
     }
 
     private async Task LoadMarketDataAsync()
