@@ -1,11 +1,16 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Desktop_Crypto_Portfolio_Tracker.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="using:Desktop_Crypto_Portfolio_Tracker.Models"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
         x:Class="Desktop_Crypto_Portfolio_Tracker.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel" 
         Title="Crypto Tracker"
         TransparencyLevelHint="AcrylicBlur"
-        Background="#1E1E1E" Foreground="White">
+        Background="#1E1E1E" 
+        Foreground="White">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -16,6 +21,7 @@
         <TabItem Header="Market Prices" FontSize="16" FontWeight="Bold">
             <Grid RowDefinitions="Auto, *">
                 <TextBlock Text="Top Market Coins" FontSize="20" Margin="10,20,0,10" Foreground="#CCCCCC"/>
+                
                 <DataGrid Grid.Row="1" ItemsSource="{Binding MarketCoins}" 
                           AutoGenerateColumns="False" IsReadOnly="True" 
                           Background="#252526" RowBackground="Transparent" GridLinesVisibility="Horizontal">
@@ -39,6 +45,7 @@
                             <TextBlock Text="Total Balance" Foreground="#AAAAAA"/>
                             <TextBlock Text="{Binding TotalBalance, StringFormat='${0:N2}'}" FontSize="36" FontWeight="Bold" Foreground="#4CAF50"/>
                         </StackPanel>
+                        
                         <Button Grid.Column="1" Content="+ Add Transaction" 
                                 Click="OnAddTransactionClick" 
                                 Background="#007ACC" Foreground="White" 
