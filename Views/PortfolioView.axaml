@@ -4,60 +4,137 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Desktop_Crypto_Portfolio_Tracker.ViewModels"
              xmlns:asyncImageLoader="using:AsyncImageLoader"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="Desktop_Crypto_Portfolio_Tracker.Views.PortfolioView" 
              x:DataType="vm:MainWindowViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#666666"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10,0,10,10"/>
+        </Style>
+
+        <Style Selector="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0,8"/>
+        </Style>
+        
+        <Style Selector="DataGridRow:pointerover /template/ Border#BackgroundBorder">
+            <Setter Property="Background" Value="#1A1A1A"/>
+        </Style>
+
+        <Style Selector="Button.DeleteBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#444444"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="6"/>
+        </Style>
+        <Style Selector="Button.DeleteBtn:pointerover">
+            <Setter Property="Background" Value="#2A1010"/>
+            <Setter Property="Foreground" Value="#FF453A"/>
+        </Style>
+    </UserControl.Styles>
     
     <Grid RowDefinitions="Auto, *">
-        <Border Grid.Row="0" Background="#2D2D30" CornerRadius="8" Padding="20" Margin="0,10,0,20">
-            <Grid ColumnDefinitions="*, Auto">
-                <StackPanel>
-                    <TextBlock Text="Total Balance" Foreground="#AAAAAA"/>
-                    <TextBlock Text="{Binding TotalBalance, StringFormat='${0:N2}'}" FontSize="36" FontWeight="Bold" Foreground="#4CAF50"/>
-                </StackPanel>
+        
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" Margin="0,0,0,30">
+            
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Text="TOTAL BALANCE" 
+                           FontSize="11" 
+                           FontWeight="Bold" 
+                           Foreground="#666666" 
+                           LetterSpacing="1.5"/>
                 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <TextBlock Text="{Binding TotalBalance, StringFormat='${0:N2}'}" 
+                           FontSize="42" 
+                           FontWeight="Bold" 
+                           Foreground="White"
+                           Margin="0,5,0,0"
+                           LetterSpacing="-1"/>
+            </StackPanel>
+            
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
     
-                    <Button Content="🖨 Print PDF" 
-                            Click="OnPrintClick"
-                            Background="#444444" Foreground="White"
-                            FontSize="14" Padding="15,10"/>
+                <Button Content="Print PDF" 
+                        Click="OnPrintClick"
+                        Background="Transparent" 
+                        Foreground="#CCCCCC"
+                        BorderBrush="#444444"
+                        BorderThickness="1"
+                        CornerRadius="0"
+                        FontSize="13" 
+                        Padding="20,10"/>
 
-                    <Button Content="+ Add Transaction" 
-                            Click="OnAddTransactionClick"
-                            Background="#007ACC" Foreground="White" 
-                            FontSize="14" Padding="20,10"/>
-                </StackPanel>
-            </Grid>
-        </Border>
+                <Button Content="+ Add Transaction" 
+                        Click="OnAddTransactionClick"
+                        Background="White" 
+                        Foreground="Black" 
+                        FontWeight="Bold"
+                        CornerRadius="0"
+                        FontSize="13" 
+                        Padding="20,10"/>
+            </StackPanel>
+        </Grid>
 
         <DataGrid Grid.Row="1" ItemsSource="{Binding MyPortfolio}" 
                   AutoGenerateColumns="False" IsReadOnly="True"
-                  Background="#252526" RowBackground="Transparent">
+                  Background="Transparent" 
+                  RowBackground="Transparent"
+                  GridLinesVisibility="None"
+                  HeadersVisibility="Column"
+                  BorderThickness="0">
+            
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Asset" Width="*">
+                <DataGridTemplateColumn Header="ASSET" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="5,0">
-                                <Image Width="24" Height="24"
-                                       VerticalAlignment="Center"
-                                       asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}"/>
-                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="10,0">
+                                <Border Width="28" Height="28" CornerRadius="0" ClipToBounds="True" Background="#111">
+                                    <Image asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}" Stretch="Uniform"/>
+                                </Border>
+                                <TextBlock Text="{Binding Name}" 
+                                           VerticalAlignment="Center" 
+                                           FontWeight="SemiBold" 
+                                           Foreground="White"
+                                           FontSize="15"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat='${0:N2}'}" Width="120"/>
-                <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" Width="120"/>
-                <DataGridTextColumn Header="Total Value" Binding="{Binding TotalValue, StringFormat='${0:N2}'}" Width="150" FontWeight="Bold"/>
+                <DataGridTextColumn Header="PRICE" 
+                                    Binding="{Binding Price, StringFormat='${0:N2}'}" 
+                                    Width="120"
+                                    Foreground="#AAAAAA"
+                                    FontSize="14"/>
+                
+                <DataGridTextColumn Header="AMOUNT" 
+                                    Binding="{Binding Amount}" 
+                                    Width="120"
+                                    Foreground="#AAAAAA"
+                                    FontSize="14"/>
+                
+                <DataGridTextColumn Header="VALUE" 
+                                    Binding="{Binding TotalValue, StringFormat='${0:N2}'}" 
+                                    Width="150" 
+                                    FontWeight="Bold"
+                                    Foreground="White"
+                                    FontSize="14"/>
 
-                <DataGridTemplateColumn Width="50">
+                <DataGridTemplateColumn Width="60">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Content="✕" Click="OnDeleteClick"
-                                    Background="Transparent" Foreground="#FF5555" 
-                                    HorizontalAlignment="Center"/>
+                            <Button Content="✕" 
+                                    Classes="DeleteBtn"
+                                    Click="OnDeleteClick"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

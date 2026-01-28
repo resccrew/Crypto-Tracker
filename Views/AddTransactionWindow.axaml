@@ -4,48 +4,144 @@
         xmlns:asyncImageLoader="using:AsyncImageLoader" 
         x:Class="Desktop_Crypto_Portfolio_Tracker.Views.AddTransactionWindow"
         Title="Add Transaction"
-        Width="400" Height="480"
+        Width="400" Height="500"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         ExtendClientAreaToDecorationsHint="True"
         TransparencyLevelHint="AcrylicBlur"
-        Background="#1E1E1E">
+        Background="Transparent"
+        SystemDecorations="None">
 
-    <Border Padding="20">
-        <StackPanel Spacing="15">
-            <TextBlock Text="Add New Asset" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+    <Window.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Background" Value="#1C1C1E"/>
+            <Setter Property="BorderBrush" Value="#333333"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="#252525"/>
+        </Style>
 
-            <TextBlock Text="Select Coin" Foreground="#AAAAAA"/>
-            <ComboBox Name="CoinComboBox" 
-                      HorizontalAlignment="Stretch" 
-                      Background="#252526" 
-                      Foreground="White"
-                      PlaceholderText="Choose a coin..."
-                      SelectionChanged="Coin_SelectionChanged">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate x:DataType="models:Coin">
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <Image Width="20" Height="20"
-                                   VerticalAlignment="Center"
-                                   asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}"/>
-                            
-                            <TextBlock Text="{Binding Symbol}" FontWeight="Bold" Width="45" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+        <Style Selector="ComboBox">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Background" Value="#1C1C1E"/>
+            <Setter Property="BorderBrush" Value="#333333"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="12,0"/>
+        </Style>
 
-            <TextBlock Text="Buy Price ($)" Foreground="#AAAAAA"/>
-            <TextBox Name="PriceBox" Watermark="0.00" Background="#252526" Foreground="White"/>
+        <Style Selector="Button">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button:pointerover">
+            <Setter Property="Opacity" Value="0.9"/>
+            <Setter Property="RenderTransform" Value="scale(1.02)"/>
+        </Style>
+        <Style Selector="Button:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.96)"/>
+        </Style>
+    </Window.Styles>
 
-            <TextBlock Text="Amount" Foreground="#AAAAAA"/>
-            <TextBox Name="AmountBox" Watermark="0.00" Background="#252526" Foreground="White"/>
+    <Border Background="#0F0F0F" 
+            BorderBrush="#333333" 
+            BorderThickness="1" 
+            CornerRadius="0" 
+            Padding="30"
+            Margin="10">
+        
+        <Border.BoxShadow>0 0 40 0 #000000</Border.BoxShadow>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="0,30,0,0">
-                <Button Content="Cancel" Click="Cancel_Click" Width="100" HorizontalContentAlignment="Center" Background="#333333" Foreground="White"/>
-                <Button Content="Add Asset" Click="Add_Click" Width="100" HorizontalContentAlignment="Center" Background="#007ACC" Foreground="White" FontWeight="Bold"/>
+        <Grid RowDefinitions="Auto, *, Auto">
+            
+            <StackPanel Grid.Row="0" Margin="0,10,0,30">
+                <TextBlock Text="New Transaction" 
+                           FontSize="22" 
+                           FontWeight="Bold" 
+                           Foreground="White" 
+                           HorizontalAlignment="Center" 
+                           LetterSpacing="0.5"/>
+                <TextBlock Text="Add asset to your portfolio" 
+                           FontSize="13" 
+                           Foreground="#666666" 
+                           HorizontalAlignment="Center" 
+                           Margin="0,5,0,0"/>
             </StackPanel>
-        </StackPanel>
+
+            <StackPanel Grid.Row="1" Spacing="20">
+                
+                <StackPanel Spacing="8">
+                    <TextBlock Text="SELECT COIN" FontSize="11" FontWeight="Bold" Foreground="#666666" LetterSpacing="1"/>
+                    <ComboBox Name="CoinComboBox" 
+                              PlaceholderText="Search or select coin..."
+                              SelectionChanged="Coin_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:Coin">
+                                <Grid ColumnDefinitions="Auto, Auto, *">
+                                    <Image Grid.Column="0" Width="20" Height="20" Margin="0,0,10,0"
+                                           VerticalAlignment="Center"
+                                           asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Symbol}" FontWeight="Bold" Foreground="White" Width="50" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Name}" Foreground="#AAAAAA" VerticalAlignment="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Spacing="8">
+                    <TextBlock Text="BUY PRICE (PER COIN)" FontSize="11" FontWeight="Bold" Foreground="#666666" LetterSpacing="1"/>
+                    <Grid>
+                        <TextBlock Text="$" Foreground="#555" VerticalAlignment="Center" Margin="12,0,0,0" ZIndex="1"/>
+                        <TextBox Name="PriceBox" Watermark="0.00" Padding="25,10,10,10"/>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Spacing="8">
+                    <TextBlock Text="AMOUNT" FontSize="11" FontWeight="Bold" Foreground="#666666" LetterSpacing="1"/>
+                    <TextBox Name="AmountBox" Watermark="0.00"/>
+                </StackPanel>
+
+            </StackPanel>
+
+            <Grid Grid.Row="2" ColumnDefinitions="*, *" Margin="0,30,0,0">
+                
+                <Button Content="Cancel" 
+                        Click="Cancel_Click"
+                        Grid.Column="0"
+                        Background="Transparent"
+                        Foreground="#888888"
+                        FontWeight="SemiBold"
+                        HorizontalAlignment="Left"
+                        Padding="10"/>
+
+                <Button Content="Add Asset" 
+                        Click="Add_Click"
+                        Grid.Column="1"
+                        Background="White" 
+                        Foreground="Black" 
+                        FontWeight="Bold"
+                        CornerRadius="0"
+                        Height="46"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"/>
+            </Grid>
+
+        </Grid>
     </Border>
 </Window>
