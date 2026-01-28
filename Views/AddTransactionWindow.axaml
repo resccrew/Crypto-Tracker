@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:models="using:Desktop_Crypto_Portfolio_Tracker.Models"
+        xmlns:asyncImageLoader="using:AsyncImageLoader" 
         x:Class="Desktop_Crypto_Portfolio_Tracker.Views.AddTransactionWindow"
         Title="Add Transaction"
         Width="400" Height="480"
@@ -24,8 +25,12 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate x:DataType="models:Coin">
                         <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="{Binding Symbol}" FontWeight="Bold" Width="40"/>
-                            <TextBlock Text="{Binding Name}" />
+                            <Image Width="20" Height="20"
+                                   VerticalAlignment="Center"
+                                   asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}"/>
+                            
+                            <TextBlock Text="{Binding Symbol}" FontWeight="Bold" Width="45" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
