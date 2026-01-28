@@ -8,13 +8,13 @@ public class Coin
     public int Rank { get; set; }
 
     [JsonPropertyName("id")]
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     [JsonPropertyName("symbol")]
-    public string Symbol { get; set; }
+    public string? Symbol { get; set; }
 
     [JsonPropertyName("current_price")]
     public decimal Price { get; set; }
@@ -22,5 +22,5 @@ public class Coin
     [JsonPropertyName("price_change_percentage_24h")]
     public double Change24h { get; set; }
 
-    public string UpperSymbol => Symbol?.ToUpper();
+    public string UpperSymbol => Symbol?.ToUpper() ?? "";
 }

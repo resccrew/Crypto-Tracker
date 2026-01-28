@@ -1,5 +1,7 @@
-using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using Desktop_Crypto_Portfolio_Tracker.Models;
@@ -7,25 +9,37 @@ using Desktop_Crypto_Portfolio_Tracker.Services;
 
 namespace Desktop_Crypto_Portfolio_Tracker.ViewModels;
 
-// Я прибрав ": ViewModelBase", оскільки цього файлу у тебе фізично немає в проекті
-public class MainWindowViewModel 
+public class MainWindowViewModel : INotifyPropertyChanged
 {
     private readonly CoinGeckoService _coinService;
+    private decimal _totalBalance;
 
     public ObservableCollection<Coin> MarketCoins { get; } = new();
     public ObservableCollection<PortfolioDisplayItem> MyPortfolio { get; } = new();
+
+    // Властивість для загального балансу
+    public decimal TotalBalance
+    {
+        get => _totalBalance;
+        set
+        {
+            _totalBalance = value;
+            OnPropertyChanged(); // Повідомляємо інтерфейс про зміну
+        }
+    }
 
     public MainWindowViewModel()
     {
         _coinService = new CoinGeckoService();
         _ = LoadMarketDataAsync();
-        LoadDummyPortfolio();
+        
+        // Початковий баланс 0
+        RecalculateBalance();
     }
 
     private async Task LoadMarketDataAsync()
     {
         var coins = await _coinService.GetTopCoinsAsync();
-
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
             MarketCoins.Clear();
@@ -37,17 +51,23 @@ public class MainWindowViewModel
         });
     }
 
-    private void LoadDummyPortfolio()
+    // Метод перерахунку балансу
+    public void RecalculateBalance()
     {
-        MyPortfolio.Add(new PortfolioDisplayItem { Name = "Bitcoin", Price = 64000.50m, Amount = 0.5m });
-        MyPortfolio.Add(new PortfolioDisplayItem { Name = "Ethereum", Price = 3450.00m, Amount = 10.0m });
-        MyPortfolio.Add(new PortfolioDisplayItem { Name = "Solana", Price = 145.20m, Amount = 50.0m });
+        TotalBalance = MyPortfolio.Sum(item => item.TotalValue);
+    }
+
+    // Стандартна реалізація повідомлення про зміни (MVVM)
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
 
 public class PortfolioDisplayItem
 {
-    public string Name { get; set; }
+    public string? Name { get; set; } 
     public decimal Price { get; set; }
     public decimal Amount { get; set; }
     public decimal TotalValue => Price * Amount;

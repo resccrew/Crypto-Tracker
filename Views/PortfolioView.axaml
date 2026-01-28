@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Desktop_Crypto_Portfolio_Tracker.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Desktop_Crypto_Portfolio_Tracker.Views.PortfolioView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <Grid RowDefinitions="Auto, *">
+        <Border Grid.Row="0" Background="#2D2D30" CornerRadius="8" Padding="20" Margin="0,10,0,20">
+            <Grid ColumnDefinitions="*, Auto">
+                <StackPanel>
+                    <TextBlock Text="Total Balance" Foreground="#AAAAAA"/>
+                    <TextBlock Text="$ 62,500.00" FontSize="36" FontWeight="Bold" Foreground="#4CAF50"/>
+                </StackPanel>
+                
+                <Button Grid.Column="1" Content="+ Add Transaction" 
+                        Click="OnAddTransactionClick"
+                        Background="#007ACC" Foreground="White" 
+                        FontSize="14" Padding="20,10" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <DataGrid Grid.Row="1" ItemsSource="{Binding MyPortfolio}" 
+                  AutoGenerateColumns="False" IsReadOnly="True"
+                  Background="#252526" RowBackground="Transparent">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Asset" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Price" Binding="{Binding Price, StringFormat='${0:N2}'}" Width="120"/>
+                <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" Width="120"/>
+                <DataGridTextColumn Header="Total Value" Binding="{Binding TotalValue, StringFormat='${0:N2}'}" Width="150" FontWeight="Bold"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

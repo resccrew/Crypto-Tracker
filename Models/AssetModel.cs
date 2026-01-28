@@ -3,8 +3,8 @@ namespace Desktop_Crypto_Portfolio_Tracker.Models
     public class AssetModel
     {
         public int Rank { get; set; }           // Для вкладки Рынок (№1, №2...)
-        public string Name { get; set; }        // Bitcoin
-        public string Symbol { get; set; }      // BTC
+        public string? Name { get; set; }        // Bitcoin
+        public string? Symbol { get; set; }      // BTC
         public decimal Price { get; set; }      // $95,000
         public double Change24h { get; set; }   // +2.5%
         
