@@ -7,7 +7,6 @@ using Desktop_Crypto_Portfolio_Tracker.Services;
 
 namespace Desktop_Crypto_Portfolio_Tracker.ViewModels;
 
-// Я прибрав ": ViewModelBase", оскільки цього файлу у тебе фізично немає в проекті
 public class MainWindowViewModel 
 {
     private readonly CoinGeckoService _coinService;

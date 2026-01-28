@@ -25,17 +25,17 @@ public class LoginViewModel
 
             if (string.IsNullOrWhiteSpace(Email))
             {
-                Error = "Введи email.";
+                Error = "Enter email.";
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(Password))
             {
-                Error = "Введи пароль.";
+                Error = "Enter password.";
                 return;
             }
 
-            // Поки без БД — вважаємо логін успішним
+            
             LoginSucceeded?.Invoke();
         });
 
