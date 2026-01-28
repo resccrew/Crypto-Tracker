@@ -1,38 +1,91 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Desktop_Crypto_Portfolio_Tracker.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="Desktop_Crypto_Portfolio_Tracker.Views.LoginView"
              x:DataType="vm:LoginViewModel">
-  <Grid Background="#1E1E1E">
-    <Border Width="380" Padding="28" Background="#252526"
-            CornerRadius="12"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center">
-      <StackPanel Spacing="10">
-        <TextBlock Text="Login" FontSize="26" Foreground="White"/>
 
-        <TextBlock Text="Email" Foreground="#BDBDBD"/>
-        <TextBox Text="{Binding Email}" Height="34"/>
+    <UserControl.Styles>
+        <Style Selector="TextBox">
+            <Setter Property="Height" Value="46"/>
+            <Setter Property="CornerRadius" Value="0"/> <Setter Property="Background" Value="#1C1C1E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#333333"/>
+            <Setter Property="Padding" Value="15,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="SelectionBrush" Value="#666666"/>
+        </Style>
+        
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="#252525"/>
+        </Style>
 
-        <TextBlock Text="Password" Foreground="#BDBDBD"/>
-        <TextBox Text="{Binding Password}" PasswordChar="●" Height="34"/>
+        <Style Selector="Button">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button:pointerover">
+            <Setter Property="Opacity" Value="0.9"/>
+        </Style>
+        <Style Selector="Button:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.98)"/>
+        </Style>
+    </UserControl.Styles>
 
-        <TextBlock Text="{Binding Error}" Foreground="Tomato" TextWrapping="Wrap"/>
+    <Grid Background="#000000">
+        
+        <Border Width="400" 
+                Padding="35" 
+                Background="#111111"
+                BorderBrush="#2A2A2A"
+                BorderThickness="1"
+                CornerRadius="0" HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            
+            <Border.BoxShadow>0 0 30 0 #10000000</Border.BoxShadow>
 
-        <Button Content="Login" 
-        Height="36" 
-        HorizontalAlignment="Center"
-        Command="{Binding LoginCommand}"/>
+            <StackPanel Spacing="20">
+                <StackPanel Spacing="5" Margin="0,0,0,10">
+                    <TextBlock Text="LOG IN" FontSize="24" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" LetterSpacing="1"/>
+                    <TextBlock Text="Welcome back to your portfolio" FontSize="14" Foreground="#666666" HorizontalAlignment="Center"/>
+                </StackPanel>
 
-        <Button Content="Create account"
-        Height="32"
-        Background="Transparent"
-        Foreground="#4EA1FF"
-        BorderThickness="0"
-        HorizontalAlignment="Center"
-        Command="{Binding GoToRegisterCommand}"/>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="EMAIL" FontSize="11" FontWeight="Bold" Foreground="#666666" LetterSpacing="0.5"/>
+                    <TextBox Text="{Binding Email}" Watermark="name@example.com"/>
+                </StackPanel>
 
-      </StackPanel>
-    </Border>
-  </Grid>
+                <StackPanel Spacing="8">
+                    <TextBlock Text="PASSWORD" FontSize="11" FontWeight="Bold" Foreground="#666666" LetterSpacing="0.5"/>
+                    <TextBox Text="{Binding Password}" PasswordChar="●" Watermark="Your password"/>
+                </StackPanel>
+
+                <TextBlock Text="{Binding Error}" Foreground="#FF453A" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Center" IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+                <StackPanel Spacing="15" Margin="0,10,0,0">
+                    
+                    <Button Content="Login" 
+                            Command="{Binding LoginCommand}"
+                            Height="48"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="White"
+                            Foreground="Black"
+                            FontWeight="Bold"
+                            FontSize="15"
+                            CornerRadius="0"/> <Button Content="Create account" Command="{Binding GoToRegisterCommand}" Height="32" Background="Transparent" Foreground="#888888" BorderThickness="0" HorizontalAlignment="Center" FontSize="14" Cursor="Hand"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
 </UserControl>

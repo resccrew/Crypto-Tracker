@@ -2,9 +2,37 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="Desktop_Crypto_Portfolio_Tracker.Views.LoginWindow"
         x:DataType="x:Object"
-        Title="Auth"
-        Width="520" Height="360"
-        Background="#1E1E1E">
+        Title="Crypto Tracker"
+        Width="480" Height="600"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="PreferSystemChrome"
+        TransparencyLevelHint="AcrylicBlur"
+        Background="#000000"
+        Foreground="White">
 
-  <ContentControl Content="{Binding}" />
+    <Grid>
+        <Grid.Background>
+            <RadialGradientBrush Center="50%,0%" GradientOrigin="50%,0%" RadiusX="150%" RadiusY="150%">
+                <GradientStop Color="#1A1A1A" Offset="0"/>
+                <GradientStop Color="#000000" Offset="1"/>
+            </RadialGradientBrush>
+        </Grid.Background>
+
+        <TextBlock Text="CRYPTO TRACKER" 
+                   VerticalAlignment="Top" 
+                   HorizontalAlignment="Center" 
+                   Margin="0,40,0,0"
+                   FontSize="12"
+                   FontWeight="Bold"
+                   Foreground="#333333"
+                   LetterSpacing="2"
+                   IsHitTestVisible="False"/>
+
+        <ContentControl Content="{Binding}" 
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Center"/>
+        
+    </Grid>
 </Window>

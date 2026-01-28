@@ -4,42 +4,104 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:Desktop_Crypto_Portfolio_Tracker.ViewModels"
              xmlns:asyncImageLoader="using:AsyncImageLoader" 
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="Desktop_Crypto_Portfolio_Tracker.Views.MarketView"
              x:DataType="vm:MainWindowViewModel">
+
+    <UserControl.Styles>
+        
+        <Style Selector="DataGridColumnHeader">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#555555"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10,0,10,10"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        </Style>
+
+        <Style Selector="DataGridCell">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style Selector="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Padding" Value="0,8"/>
+        </Style>
+
+        <Style Selector="DataGridRow:pointerover /template/ Border#BackgroundBorder">
+            <Setter Property="Background" Value="#111111"/>
+        </Style>
+
+    </UserControl.Styles>
     
     <Grid RowDefinitions="Auto, *">
-        <TextBlock Text="Top Market Coins" FontSize="20" Margin="10,20,0,10" Foreground="#CCCCCC"/>
+        
+        <StackPanel Margin="0,0,0,25">
+            <TextBlock Text="MARKET OVERVIEW" 
+                       FontSize="11" 
+                       FontWeight="Bold" 
+                       Foreground="#666666" 
+                       LetterSpacing="2"/>
+            <TextBlock Text="Top Currencies" 
+                       FontSize="32" 
+                       FontWeight="Bold" 
+                       Foreground="White"
+                       Margin="0,5,0,0"/>
+        </StackPanel>
 
-        <DataGrid Grid.Row="1" ItemsSource="{Binding MarketCoins}" 
-                  AutoGenerateColumns="False" IsReadOnly="True" 
-                  Background="#252526" RowBackground="Transparent" 
-                  GridLinesVisibility="Horizontal" HeadersVisibility="Column">
+        <DataGrid Grid.Row="1" 
+                  ItemsSource="{Binding MarketCoins}" 
+                  AutoGenerateColumns="False" 
+                  IsReadOnly="True" 
+                  
+                  Background="Transparent" 
+                  RowBackground="Transparent" 
+                  GridLinesVisibility="None" 
+                  HeadersVisibility="Column"
+                  BorderThickness="0">
+            
             <DataGrid.Columns>
-                <DataGridTextColumn Header="#" Binding="{Binding Rank}" Width="50"/>
                 
-                <DataGridTemplateColumn Header="Name" Width="*">
+                <DataGridTextColumn Header="#" Binding="{Binding Rank}" Width="50" Foreground="#444444" FontWeight="Bold"/>
+                
+                <DataGridTemplateColumn Header="ASSET" Width="2*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="5,0">
-                                <Image Width="24" Height="24" 
-                                       asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}"/>
-                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                            <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center" Margin="5,0">
+                                <Border CornerRadius="20" ClipToBounds="True" Width="28" Height="28" Background="#1A1A1A">
+                                    <Image asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}" Stretch="Uniform"/>
+                                </Border>
+                                
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="14"/>
+                                    <TextBlock Text="{Binding Symbol}" FontWeight="SemiBold" Foreground="#666666" FontSize="11"/>
+                                </StackPanel>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Symbol" Binding="{Binding Symbol}" Width="120" FontWeight="Bold" Foreground="#888888"/>
+                <DataGridTextColumn Header="PRICE" 
+                                    Binding="{Binding Price, StringFormat='${0:N2}'}" 
+                                    Width="150" 
+                                    FontWeight="Medium" 
+                                    Foreground="#E0E0E0"/>
                 
-                <DataGridTextColumn Header="Price (USD)" Binding="{Binding Price, StringFormat='${0:N2}'}" Width="150"/>
-                
-                <DataGridTemplateColumn Header="24h %" Width="100">
+                <DataGridTemplateColumn Header="24H CHANGE" Width="120">
                      <DataGridTemplateColumn.CellTemplate>
                          <DataTemplate>
-                             <TextBlock Text="{Binding Change24h, StringFormat='{}{0:N2}%'}" 
-                                        Foreground="{Binding Change24h, Converter={x:Static vm:PriceColorConverter.Instance}}"
-                                        VerticalAlignment="Center"/>
+                             <Border CornerRadius="6" 
+                                     Padding="8,4" 
+                                     HorizontalAlignment="Left"
+                                     VerticalAlignment="Center">
+                                 <TextBlock Text="{Binding Change24h, StringFormat='{}{0:N2}%'}" 
+                                            Foreground="{Binding Change24h, Converter={x:Static vm:PriceColorConverter.Instance}}"
+                                            FontWeight="Bold"
+                                            FontSize="13"/>
+                             </Border>
                          </DataTemplate>
                      </DataGridTemplateColumn.CellTemplate>
                  </DataGridTemplateColumn>
