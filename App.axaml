@@ -1,11 +1,25 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Desktop_Crypto_Portfolio_Tracker.ViewModels"
+             xmlns:views="using:Desktop_Crypto_Portfolio_Tracker.Views"
              x:Class="Desktop_Crypto_Portfolio_Tracker.App"
              RequestedThemeVariant="Default">
+
              <Application.Styles>
         <FluentTheme />
         
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
         
     </Application.Styles>
+
+    <Application.DataTemplates>
+    <DataTemplate DataType="{x:Type vm:LoginViewModel}">
+      <views:LoginView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:RegisterViewModel}">
+      <views:RegisterView/>
+    </DataTemplate>
+  </Application.DataTemplates>
+
 </Application>

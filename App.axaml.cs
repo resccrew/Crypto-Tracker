@@ -17,10 +17,20 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
+            var loginWindow = new LoginWindow();
+
+            loginWindow.Closed += (_, __) =>
             {
-                DataContext = new MainWindowViewModel(),
+                // якщо користувач закрив логін — закриваємо додаток
+                if (desktop.MainWindow == null || !desktop.MainWindow.IsVisible)
+                desktop.Shutdown();
             };
+
+            // Показуємо логін першим
+            loginWindow.Show();
+
+            // ВАЖЛИВО: не виставляємо MainWindow відразу
+            // desktop.MainWindow буде створено після успішного логіну
         }
 
         base.OnFrameworkInitializationCompleted();

@@ -1,0 +1,38 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Desktop_Crypto_Portfolio_Tracker.ViewModels"
+             x:Class="Desktop_Crypto_Portfolio_Tracker.Views.LoginView"
+             x:DataType="vm:LoginViewModel">
+  <Grid Background="#1E1E1E">
+    <Border Width="380" Padding="28" Background="#252526"
+            CornerRadius="12"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+      <StackPanel Spacing="10">
+        <TextBlock Text="Login" FontSize="26" Foreground="White"/>
+
+        <TextBlock Text="Email" Foreground="#BDBDBD"/>
+        <TextBox Text="{Binding Email}" Height="34"/>
+
+        <TextBlock Text="Password" Foreground="#BDBDBD"/>
+        <TextBox Text="{Binding Password}" PasswordChar="●" Height="34"/>
+
+        <TextBlock Text="{Binding Error}" Foreground="Tomato" TextWrapping="Wrap"/>
+
+        <Button Content="Login" 
+        Height="36" 
+        HorizontalAlignment="Center"
+        Command="{Binding LoginCommand}"/>
+
+        <Button Content="Create account"
+        Height="32"
+        Background="Transparent"
+        Foreground="#4EA1FF"
+        BorderThickness="0"
+        HorizontalAlignment="Center"
+        Command="{Binding GoToRegisterCommand}"/>
+
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>
