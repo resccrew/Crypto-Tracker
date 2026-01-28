@@ -1,4 +1,4 @@
-# 🪙 Desktop Crypto Portfolio Tracker
+# Desktop Crypto Portfolio Tracker
 
 Desktop to aplikacja do śledzenia wartości portfela inwestycyjnego kryptowalut.
 Umożliwia przeglądanie aktualnych kursów (COINGECKO API), prowadzenie ewidencji transakcji i generowanie raportów w formacie PDF.
@@ -7,19 +7,20 @@ Umożliwia przeglądanie aktualnych kursów (COINGECKO API), prowadzenie ewidenc
 
 ---
 
-## 🚀 Wymagania (Prerequisites)
+## Wymagania
 
 Przed uruchomieniem upewnij się, że masz zainstalowane:
-1.  ** IDE: * * JetBrains Rider (zalecane) lub Visual Studio 2022.
+1.  ** IDE: * * JetBrains Rider lub Visual Studio 2022.
 2.  ** . NET SDK 9.0 * * (Sprawdź wersję ` 'dotnet -- version'`.
 3.  **Git**.
 
 ---
 
-## ⚙ ️ Instalacja i uruchomienie
-
+## Instalacja i uruchomienie
 ### 1. Klonowanie repozytorium
 Otwórz terminal i uruchom polecenie:
 ```bash
 git clone [https://github.com/resccrew/Crypto-Tracker.git](https://github.com/resccrew/Crypto-Tracker.git)
 cd Crypto-Tracker
+dotnet restore
+dotnet run 
