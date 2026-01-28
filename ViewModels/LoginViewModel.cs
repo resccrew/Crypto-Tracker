@@ -30,13 +30,13 @@ public class LoginViewModel : INotifyPropertyChanged
 
             if (string.IsNullOrWhiteSpace(Email))
             {
-                Error = "Введи email.";
+                Error = "Enter email.";
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(Password))
             {
-                Error = "Введи пароль.";
+                Error = "Enter password.";
                 return;
             }
 
@@ -57,6 +57,8 @@ if (!_db.IsEmailVerified(Email))
 }
 
 Error = "Password mismatch";
+            
+            
             
         });
 

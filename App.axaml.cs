@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Desktop_Crypto_Portfolio_Tracker.ViewModels;
-using Desktop_Crypto_Portfolio_Tracker.Views; // Цей рядок обов'язковий!
+using Desktop_Crypto_Portfolio_Tracker.Views; 
 
 namespace Desktop_Crypto_Portfolio_Tracker;
 

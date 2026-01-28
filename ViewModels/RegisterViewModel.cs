@@ -39,19 +39,19 @@ public class RegisterViewModel : INotifyPropertyChanged
 
             if (string.IsNullOrWhiteSpace(Email))
             {
-                Error = "Введи email.";
+                Error = "Enter email.";
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(Password) || Password.Length < 8)
             {
-                Error = "Пароль мінімум 8 символів.";
+                Error = "Password must have at least 8 symbols.";
                 return;
             }
 
             if (Password != ConfirmPassword)
             {
-                Error = "Паролі не співпадають.";
+                Error = "Passwords don't match.";
                 return;
             }
 
