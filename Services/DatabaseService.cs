@@ -5,15 +5,15 @@ using System.Text;
 
 public class DatabaseService
 {
-    private string _connectionString = "Data Source=D:\\projects\\dropstab\\Crypto-Tracker\\database.db";
+    // Використовуйте крапку для поточного каталогу, якщо база поруч з .exe
+    private string _connectionString = "Data Source=database.db"; 
 
     public DatabaseService()
     {
-        // Ініціалізація БД (створення таблиць, якщо їх немає)
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
-        // Тут можна виконати ваш SQL скрипт CREATE TABLE...
     }
+
     public bool UserExists(string email)
     {
         try
@@ -25,8 +25,9 @@ public class DatabaseService
             command.CommandText = "SELECT COUNT(*) FROM Users WHERE email = @email";
             command.Parameters.AddWithValue("@email", email);
 
-            // ExecuteScalar повертає кількість знайдених рядків
-            long count = (long)command.ExecuteScalar();
+            // ВИПРАВЛЕНО: Безпечне отримання значення
+            var result = command.ExecuteScalar();
+            long count = result != null ? Convert.ToInt64(result) : 0;
             return count > 0;
         }
         catch (Exception ex)
@@ -35,6 +36,7 @@ public class DatabaseService
             return false;
         }
     }
+
     public bool RegisterUser(string email, string password)
     {
         try
@@ -43,21 +45,18 @@ public class DatabaseService
             connection.Open();
 
             var command = connection.CreateCommand();
-            // Використовуємо @ для параметрів
             command.CommandText = @"
                 INSERT INTO Users (username, email, password_hash) 
                 VALUES (@name, @email, @hash)";
             
-            command.Parameters.AddWithValue("@name", email.Split('@')[0]);
+            command.Parameters.AddWithValue("@name", email.Contains('@') ? email.Split('@')[0] : email);
             command.Parameters.AddWithValue("@email", email);
             command.Parameters.AddWithValue("@hash", HashPassword(password));
 
-            int rowsAffected = command.ExecuteNonQuery();
-            return rowsAffected > 0;
+            return command.ExecuteNonQuery() > 0;
         }
         catch (Exception ex)
         {
-            // Дивіться сюди у вікні Output (Вивід) під час натискання кнопки
             System.Diagnostics.Debug.WriteLine($"DB ERROR: {ex.Message}");
             return false;
         }
@@ -65,21 +64,29 @@ public class DatabaseService
 
     public bool ValidateUser(string email, string password)
     {
-        using var connection = new SqliteConnection(_connectionString);
-        connection.Open();
+        try
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
 
-        var command = connection.CreateCommand();
-        command.CommandText = "SELECT password_hash FROM Users WHERE email = $email";
-        command.Parameters.AddWithValue("$email", email);
+            var command = connection.CreateCommand();
+            // ВИПРАВЛЕНО: замінено $email на @email для стабільності
+            command.CommandText = "SELECT password_hash FROM Users WHERE email = @email";
+            command.Parameters.AddWithValue("@email", email);
 
-        var storedHash = command.ExecuteScalar()?.ToString();
-        return storedHash != null && storedHash == HashPassword(password);
+            var storedHash = command.ExecuteScalar()?.ToString();
+            return storedHash != null && storedHash == HashPassword(password);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"VALIDATION ERROR: {ex.Message}");
+            return false;
+        }
     }
 
     private string HashPassword(string password)
     {
-        using var sha256 = SHA256.Create();
-        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+        byte[] bytes = SHA256.HashData(Encoding.UTF8.GetBytes(password));
         return Convert.ToBase64String(bytes);
     }
 }
