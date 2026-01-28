@@ -25,10 +25,23 @@ public partial class LoginWindow : Window
     private void ShowRegister()
     {
         var registerVm = new RegisterViewModel();
-        registerVm.RegisterSucceeded += ShowLogin;
+        registerVm.VerificationRequired += (userId, email) =>
+        {
+            ShowVerify(userId, email);
+        };
         registerVm.BackToLoginRequested += ShowLogin;
 
         DataContext = registerVm;
+    }
+
+    private void ShowVerify(long userId, string email)
+    {
+        var verifyVm = new VerifyEmailViewModel(userId, email);
+
+        verifyVm.Verified += ShowLogin;
+        verifyVm.BackRequested += ShowRegister;
+
+        DataContext = verifyVm;
     }
 
     private void OnLoginSucceeded()

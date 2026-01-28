@@ -19,6 +19,8 @@
             <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
             <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
         </PackageReference>
+        
+        <PackageReference Include="MailKit" Version="4.14.1" />
 
         <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.2" />
         <PackageReference Include="QuestPDF" Version="2025.12.3" />

@@ -20,6 +20,10 @@
     <DataTemplate DataType="{x:Type vm:RegisterViewModel}">
       <views:RegisterView/>
     </DataTemplate>
+
+    <DataTemplate DataType="vm:VerifyEmailViewModel">
+      <views:VerifyEmailView/>
+    </DataTemplate>
   </Application.DataTemplates>
 
 </Application>

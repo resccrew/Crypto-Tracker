@@ -44,10 +44,20 @@ public class LoginViewModel : INotifyPropertyChanged
             {
                 LoginSucceeded?.Invoke();
             }
-            else
-            {
-                Error = "Невірний email або пароль.";
-            }
+            if (!_db.UserExists(Email))
+{
+    Error = "User not found in DB";
+    return;
+}
+
+if (!_db.IsEmailVerified(Email))
+{
+    Error = "Email not verified";
+    return;
+}
+
+Error = "Password mismatch";
+            
         });
 
         GoToRegisterCommand = new RelayCommand(() => RegisterRequested?.Invoke());
