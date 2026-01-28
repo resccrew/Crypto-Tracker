@@ -45,7 +45,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             MarketCoins.Clear();
             foreach (var coin in coins)
             {
-                coin.Symbol = coin.Symbol.ToUpper();
+                coin.Symbol = coin.Symbol?.ToUpper();
                 MarketCoins.Add(coin);
             }
         });
@@ -71,4 +71,5 @@ public class PortfolioDisplayItem
     public decimal Price { get; set; }
     public decimal Amount { get; set; }
     public decimal TotalValue => Price * Amount;
+    public string? ImageUrl { get; set; }
 }

@@ -41,6 +41,7 @@ public partial class AddTransactionWindow : Window
             var newItem = new PortfolioDisplayItem
             {
                 Name = selectedCoin.Name, // Беремо назву з обраної монети
+                ImageUrl = selectedCoin.ImageUrl,
                 Price = price,
                 Amount = amount
             };
