@@ -29,10 +29,43 @@ namespace Desktop_Crypto_Portfolio_Tracker.Views
                 
                 if (topLevel != null)
                 {
+                    // Отримуємо нову транзакцію від користувача
                     var result = await dialog.ShowDialog<PortfolioDisplayItem>(topLevel);
+                    
                     if (result != null)
                     {
-                        viewModel.MyPortfolio.Add(result);
+                        // 👇 ГОЛОВНА ЛОГІКА ПЕРЕВІРКИ 👇
+                        
+                        // Шукаємо, чи є вже така монета в портфоліо
+                        var existingItem = viewModel.MyPortfolio.FirstOrDefault(x => x.Name == result.Name);
+
+                        if (existingItem != null)
+                        {
+                            // === ВАРІАНТ А: Монета вже є -> Оновлюємо її ===
+                            
+                            // 1. Рахуємо нову середню ціну (Weighted Average)
+                            // Формула: (СтараСума + НоваСума) / ЗагальнаКількість
+                            decimal totalCostOld = existingItem.Price * existingItem.Amount;
+                            decimal totalCostNew = result.Price * result.Amount;
+                            decimal newTotalAmount = existingItem.Amount + result.Amount;
+
+                            if (newTotalAmount > 0)
+                            {
+                                existingItem.Price = (totalCostOld + totalCostNew) / newTotalAmount;
+                            }
+
+                            // 2. Додаємо кількість
+                            existingItem.Amount = newTotalAmount;
+                            
+                            // (TotalValue перерахується автоматично завдяки змінам у ViewModel)
+                        }
+                        else
+                        {
+                            // === ВАРІАНТ Б: Це нова монета -> Додаємо в список ===
+                            viewModel.MyPortfolio.Add(result);
+                        }
+
+                        // Оновлюємо загальний баланс вгорі екрану
                         viewModel.RecalculateBalance();
                     }
                 }
@@ -86,23 +119,20 @@ namespace Desktop_Crypto_Portfolio_Tracker.Views
                     page.PageColor(Colors.White);
                     page.DefaultTextStyle(x => x.FontSize(12));
 
-                    // --- ЗАГОЛОВОК ---
                     page.Header()
                         .Text("Crypto Portfolio Report")
                         .SemiBold().FontSize(24).FontColor(Colors.Blue.Medium);
 
-                    // --- ВМІСТ ---
                     page.Content()
                         .PaddingVertical(1, Unit.Centimetre)
                         .Column(x =>
                         {
                             x.Item().Text($"Date: {DateTime.Now:g}");
-                            x.Item().Text($"Total Balance: {viewModel.TotalBalance:C2}").Bold().FontSize(16).FontColor(Colors.Green.Medium);
+                            // N2 format + manual $ sign
+                            x.Item().Text($"Total Balance: ${viewModel.TotalBalance:N2}").Bold().FontSize(16).FontColor(Colors.Green.Medium);
                             
-                            // 👇 ТУТ БУЛА ПОМИЛКА. ЗАМІНИВ НА Colors.Grey.Lighten2
                             x.Item().PaddingVertical(10).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
 
-                            // Таблиця
                             x.Item().Table(table =>
                             {
                                 table.ColumnsDefinition(columns =>
@@ -129,9 +159,9 @@ namespace Desktop_Crypto_Portfolio_Tracker.Views
                                 foreach (var item in viewModel.MyPortfolio)
                                 {
                                     table.Cell().Element(CellStyle).Text(item.Name ?? "Unknown");
-                                    table.Cell().Element(CellStyle).Text($"{item.Price:C2}");
+                                    table.Cell().Element(CellStyle).Text($"${item.Price:N2}");
                                     table.Cell().Element(CellStyle).Text($"{item.Amount}");
-                                    table.Cell().Element(CellStyle).Text($"{item.TotalValue:C2}");
+                                    table.Cell().Element(CellStyle).Text($"${item.TotalValue:N2}");
 
                                     static IContainer CellStyle(IContainer container)
                                     {
@@ -141,7 +171,6 @@ namespace Desktop_Crypto_Portfolio_Tracker.Views
                             });
                         });
 
-                    // --- ФУТЕР ---
                     page.Footer()
                         .AlignCenter()
                         .Text(x =>

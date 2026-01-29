@@ -14,26 +14,74 @@ public class MainWindowViewModel : INotifyPropertyChanged
     private readonly CoinGeckoService _coinService;
     private decimal _totalBalance;
 
+    // --- КОЛЕКЦІЇ ---
     public ObservableCollection<Coin> MarketCoins { get; } = new();
     public ObservableCollection<PortfolioDisplayItem> MyPortfolio { get; } = new();
 
-    // Властивість для загального балансу
+    // --- БАЛАНС ---
     public decimal TotalBalance
     {
         get => _totalBalance;
         set
         {
             _totalBalance = value;
-            OnPropertyChanged(); // Повідомляємо інтерфейс про зміну
+            OnPropertyChanged();
         }
     }
 
+    // --- ЛОГІКА ПОРІВНЯННЯ (COMPARATOR) ---
+    private Coin? _selectedCoinA;
+    private Coin? _selectedCoinB;
+
+    public Coin? SelectedCoinA
+    {
+        get => _selectedCoinA;
+        set
+        {
+            _selectedCoinA = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HypotheticalPrice));
+            OnPropertyChanged(nameof(PriceMultiplier));
+        }
+    }
+
+    public Coin? SelectedCoinB
+    {
+        get => _selectedCoinB;
+        set
+        {
+            _selectedCoinB = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HypotheticalPrice));
+            OnPropertyChanged(nameof(PriceMultiplier));
+        }
+    }
+
+    // Обрахунок нової ціни: PriceA * (CapB / CapA)
+    public decimal HypotheticalPrice
+    {
+        get
+        {
+            if (SelectedCoinA == null || SelectedCoinB == null || SelectedCoinA.MarketCap == 0) return 0;
+            return SelectedCoinA.Price * (SelectedCoinB.MarketCap / SelectedCoinA.MarketCap);
+        }
+    }
+
+    // Обрахунок множника (CapB / CapA)
+    public double PriceMultiplier
+    {
+        get
+        {
+            if (SelectedCoinA == null || SelectedCoinB == null || SelectedCoinA.MarketCap == 0) return 0;
+            return (double)(SelectedCoinB.MarketCap / SelectedCoinA.MarketCap);
+        }
+    }
+
+    // --- КОНСТРУКТОР ---
     public MainWindowViewModel()
     {
         _coinService = new CoinGeckoService();
         _ = LoadMarketDataAsync();
-        
-        // Початковий баланс 0
         RecalculateBalance();
     }
 
@@ -51,13 +99,11 @@ public class MainWindowViewModel : INotifyPropertyChanged
         });
     }
 
-    // Метод перерахунку балансу
     public void RecalculateBalance()
     {
         TotalBalance = MyPortfolio.Sum(item => item.TotalValue);
     }
 
-    // Стандартна реалізація повідомлення про зміни (MVVM)
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
@@ -65,11 +111,53 @@ public class MainWindowViewModel : INotifyPropertyChanged
     }
 }
 
-public class PortfolioDisplayItem
+// --- КЛАС ЕЛЕМЕНТА ПОРТФОЛІО ---
+public class PortfolioDisplayItem : INotifyPropertyChanged
 {
-    public string? Name { get; set; } 
-    public decimal Price { get; set; }
-    public decimal Amount { get; set; }
+    private string? _name;
+    private decimal _price;
+    private decimal _amount;
+    private string? _imageUrl;
+
+    public string? Name
+    {
+        get => _name;
+        set { _name = value; OnPropertyChanged(); }
+    }
+
+    public decimal Price
+    {
+        get => _price;
+        set 
+        { 
+            _price = value; 
+            OnPropertyChanged(); 
+            OnPropertyChanged(nameof(TotalValue)); 
+        }
+    }
+
+    public decimal Amount
+    {
+        get => _amount;
+        set 
+        { 
+            _amount = value; 
+            OnPropertyChanged(); 
+            OnPropertyChanged(nameof(TotalValue)); 
+        }
+    }
+
     public decimal TotalValue => Price * Amount;
-    public string? ImageUrl { get; set; }
+
+    public string? ImageUrl
+    {
+        get => _imageUrl;
+        set { _imageUrl = value; OnPropertyChanged(); }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
