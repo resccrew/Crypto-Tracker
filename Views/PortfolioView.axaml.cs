@@ -34,7 +34,6 @@ namespace Desktop_Crypto_Portfolio_Tracker.Views
                     if (result != null)
                     {
                         var db = new DatabaseService();
-                        // userId = 1 for testing
                         long newDbId = await db.AddTransactionAsync(1, result.CoinId ?? "", "Buy", (double)result.Amount, (double)result.Price);
                         
                         if (newDbId > 0)
@@ -45,7 +44,7 @@ namespace Desktop_Crypto_Portfolio_Tracker.Views
 
                             if (existingItem != null)
                             {
-                                // Weighted Average Calculation
+
                                 decimal totalCostOld = existingItem.Price * existingItem.Amount;
                                 decimal totalCostNew = result.Price * result.Amount;
                                 decimal newTotalAmount = existingItem.Amount + result.Amount;

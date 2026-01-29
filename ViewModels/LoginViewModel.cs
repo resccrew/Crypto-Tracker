@@ -65,7 +65,6 @@ Error = "Password mismatch";
         GoToRegisterCommand = new RelayCommand(() => RegisterRequested?.Invoke());
     }
 
-    // Реалізація інтерфейсу для оновлення UI
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string? name = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

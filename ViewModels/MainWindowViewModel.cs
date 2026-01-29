@@ -20,7 +20,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public ObservableCollection<Coin> MarketCoins { get; } = new();
     public ObservableCollection<PortfolioDisplayItem> MyPortfolio { get; } = new();
 
-    // --- БАЛАНС ---
     public decimal TotalBalance
     {
         get => _totalBalance;
@@ -31,7 +30,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    // --- ЛОГІКА ПОРІВНЯННЯ (COMPARATOR) ---
     private Coin? _selectedCoinA;
     private Coin? _selectedCoinB;
 
@@ -59,7 +57,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    // Обрахунок нової ціни: PriceA * (CapB / CapA)
     public decimal HypotheticalPrice
     {
         get
@@ -69,7 +66,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    // Обрахунок множника (CapB / CapA)
     public double PriceMultiplier
     {
         get
@@ -79,7 +75,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    // --- КОНСТРУКТОР ---
     public MainWindowViewModel()
     {
         _coinService = new CoinGeckoService();
@@ -146,10 +141,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
     }
 }
 
-// --- КЛАС ЕЛЕМЕНТА ПОРТФОЛІО ---
 public class PortfolioDisplayItem : INotifyPropertyChanged
 {
-    public long DbId { get; set; }      // Внутрішній ID транзакції в SQLite
+    public long DbId { get; set; }      
     public string? CoinId { get; set; }
     public string? Symbol { get; set; }
     private string? _name;
