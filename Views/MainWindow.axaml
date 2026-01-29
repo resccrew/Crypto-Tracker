@@ -69,9 +69,23 @@
                     <TextBlock Text="CRYPTO" FontWeight="Bold" FontSize="16" Foreground="White" LetterSpacing="1"/>
                     <TextBlock Text="TRACKER" FontWeight="Regular" FontSize="16" Foreground="#666666" LetterSpacing="1" Margin="5,0,0,0"/>
                 </StackPanel>
+
+                <Button Grid.Column="1"
+                Content="Logout"
+                Click="OnLogoutClick"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Padding="18,8"
+                Background="#222222"
+                Foreground="White"
+                BorderBrush="#444444"
+                BorderThickness="1"
+                CornerRadius="6"
+                Cursor="Hand"/>
+                
             </Grid>
 
-            <TabControl Grid.Row="0" Grid.RowSpan="2" Margin="0,40,0,0" Padding="0">
+            <TabControl Grid.Row="1"  Margin="0,40,0,0" Padding="0">
                 
                 <TabControl.ItemsPanel>
                     <ItemsPanelTemplate>
