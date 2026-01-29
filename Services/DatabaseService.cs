@@ -7,6 +7,7 @@ using Desktop_Crypto_Portfolio_Tracker.Models;
 using System.Xml;
 using System.Collections.Generic;
 using System.IO;
+using Desktop_Crypto_Portfolio_Tracker.ViewModels;
 
 
 
@@ -231,17 +232,19 @@ public class DatabaseService
         var updateCmd = connection.CreateCommand();
         updateCmd.Transaction = transaction;
         updateCmd.CommandText = @"
-            INSERT INTO Coins (id, symbol, name, current_price)
-            VALUES (@id, @symbol, @name, @price)
+            INSERT INTO Coins (id, symbol, name, current_price, image_url)
+            VALUES (@id, @symbol, @name, @price, @img)
             ON CONFLICT(id) DO UPDATE SET 
                 current_price = excluded.current_price,
                 symbol = excluded.symbol,
-                name = excluded.name;";
+                name = excluded.name,
+                image_url = excluded.image_url;"; // Оновлюємо картинку
 
         updateCmd.Parameters.AddWithValue("@id", coin.Id);
         updateCmd.Parameters.AddWithValue("@symbol", coin.Symbol ?? "");
         updateCmd.Parameters.AddWithValue("@name", coin.Name ?? "");
-        updateCmd.Parameters.AddWithValue("@price", priceValue);
+        updateCmd.Parameters.AddWithValue("@price", (double)coin.Price);
+        updateCmd.Parameters.AddWithValue("@img", coin.ImageUrl ?? (object)DBNull.Value); // Записуємо ImageUrl
         await updateCmd.ExecuteNonQueryAsync();
 
         // 2. Додаємо новий запис в історію
@@ -273,5 +276,90 @@ public class DatabaseService
         cleanupCmd.Parameters.AddWithValue("@limit", MaxHistoryRecords);
         await cleanupCmd.ExecuteNonQueryAsync();
     }
+    public async Task<long> AddTransactionAsync(long userId, string coinId, string type, double amount, double price)
+    {
+        try
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
 
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                INSERT INTO Transactions (user_id, coin_id, type, amount, price_at_transaction)
+                VALUES (@userId, @coinId, @type, @amount, @price);
+                SELECT last_insert_rowid();";
+
+            command.Parameters.AddWithValue("@userId", userId);
+            command.Parameters.AddWithValue("@coinId", coinId ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@type", type);
+            command.Parameters.AddWithValue("@amount", amount);
+            command.Parameters.AddWithValue("@price", price);
+
+            var result = await command.ExecuteScalarAsync();
+            return result != null ? Convert.ToInt64(result) : 0;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"DB ERROR (AddTransaction): {ex.Message}");
+            return 0;
+        }
+    }
+
+    public async Task<bool> DeleteTransactionAsync(long transactionId)
+    {
+        try
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var command = connection.CreateCommand();
+            command.CommandText = "DELETE FROM Transactions WHERE id = @id";
+            command.Parameters.AddWithValue("@id", transactionId);
+
+            return await command.ExecuteNonQueryAsync() > 0;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"DB ERROR (DeleteTransaction): {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<List<PortfolioDisplayItem>> GetUserPortfolioAsync(long userId)
+    {
+        var portfolio = new List<PortfolioDisplayItem>();
+        try
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            var command = connection.CreateCommand();
+            command.CommandText = @"
+                SELECT t.id, t.coin_id, c.name, t.amount, c.current_price, c.symbol, c.image_url
+                FROM Transactions t
+                LEFT JOIN Coins c ON t.coin_id = c.id
+                WHERE t.user_id = @userId";
+            
+            command.Parameters.AddWithValue("@userId", userId);
+
+            using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                portfolio.Add(new PortfolioDisplayItem {
+                    DbId = reader.GetInt64(0),
+                    CoinId = reader.IsDBNull(1) ? "" : reader.GetString(1),
+                    Name = reader.IsDBNull(2) ? "Unknown" : reader.GetString(2),
+                    // Безпечне приведення типів
+                    Amount = Convert.ToDecimal(reader.GetValue(3)),
+                    Price = reader.IsDBNull(4) ? 0 : Convert.ToDecimal(reader.GetValue(4)),
+                    Symbol = reader.IsDBNull(5) ? "" : reader.GetString(5),
+                    ImageUrl = reader.IsDBNull(6) ? null : reader.GetString(6)
+                });
+            }
+        }
+        catch (Exception ex) {
+            System.Diagnostics.Debug.WriteLine($"КРИТИЧНА ПОМИЛКА: {ex.Message}");
+        }
+        return portfolio;
+    }
 }

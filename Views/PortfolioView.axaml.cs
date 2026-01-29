@@ -32,21 +32,33 @@ namespace Desktop_Crypto_Portfolio_Tracker.Views
                     var result = await dialog.ShowDialog<PortfolioDisplayItem>(topLevel);
                     if (result != null)
                     {
-                        viewModel.MyPortfolio.Add(result);
-                        viewModel.RecalculateBalance();
+                        var db = new DatabaseService();
+                        // Для тесту userId = 1, у реальному проекті беріть ID авторизованого користувача
+                        long newDbId = await db.AddTransactionAsync(1, result.CoinId ?? "", "Buy", (double)result.Amount, (double)result.Price);
+                        
+                        if (newDbId > 0)
+                        {
+                            result.DbId = newDbId;
+                            viewModel.MyPortfolio.Add(result);
+                            viewModel.RecalculateBalance();
+                        }
                     }
                 }
             }
         }
 
-        private void OnDeleteClick(object? sender, RoutedEventArgs e)
+        private async void OnDeleteClick(object? sender, RoutedEventArgs e)
         {
             if (sender is Button button && 
                 button.DataContext is PortfolioDisplayItem itemToDelete &&
                 DataContext is MainWindowViewModel viewModel)
             {
-                viewModel.MyPortfolio.Remove(itemToDelete);
-                viewModel.RecalculateBalance();
+                var db = new DatabaseService();
+                if (await db.DeleteTransactionAsync(itemToDelete.DbId))
+                {
+                    viewModel.MyPortfolio.Remove(itemToDelete);
+                    viewModel.RecalculateBalance();
+                }
             }
         }
 
