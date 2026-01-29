@@ -1,0 +1,87 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Desktop_Crypto_Portfolio_Tracker.ViewModels"
+             xmlns:models="using:Desktop_Crypto_Portfolio_Tracker.Models"
+             xmlns:asyncImageLoader="using:AsyncImageLoader"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
+             x:Class="Desktop_Crypto_Portfolio_Tracker.Views.ComparisonView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <Grid RowDefinitions="Auto, Auto, *" Margin="20">
+        
+        <TextBlock Text="Calculate Price with Market Cap" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,30" Foreground="White"/>
+
+        <Border Grid.Row="1" Background="#2D2D30" CornerRadius="12" Padding="20">
+            <Grid ColumnDefinitions="*, 50, *">
+                
+                <StackPanel Grid.Column="0" Spacing="10">
+                    <TextBlock Text="Select Coin A (Source)" Foreground="#AAAAAA" HorizontalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding MarketCoins}" 
+                              SelectedItem="{Binding SelectedCoinA}"
+                              HorizontalAlignment="Stretch" Background="#252526" PlaceholderText="Select Coin...">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:Coin">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Image Width="20" Height="20" asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}"/>
+                                    <TextBlock Text="{Binding Name}"/>
+                                    <TextBlock Text="{Binding Price, StringFormat='(${0:N2})'}" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <TextBlock Grid.Column="1" Text="⇄" FontSize="30" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#007ACC" Margin="0,20,0,0"/>
+
+                <StackPanel Grid.Column="2" Spacing="10">
+                    <TextBlock Text="Select Coin B (Target Cap)" Foreground="#AAAAAA" HorizontalAlignment="Center"/>
+                    <ComboBox ItemsSource="{Binding MarketCoins}" 
+                              SelectedItem="{Binding SelectedCoinB}"
+                              HorizontalAlignment="Stretch" Background="#252526" PlaceholderText="Select Coin...">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:Coin">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Image Width="20" Height="20" asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}"/>
+                                    <TextBlock Text="{Binding Name}"/>
+                                    <TextBlock Text="{Binding MarketCap, StringFormat='Cap: ${0:N0}'}" Foreground="Gray" FontSize="10"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <StackPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" 
+                    IsVisible="{Binding SelectedCoinA, Converter={x:Static ObjectConverters.IsNotNull}}">
+            
+            <TextBlock Text="Hypothetical Price" Foreground="#888888" HorizontalAlignment="Center"/>
+            
+            <TextBlock Text="{Binding HypotheticalPrice, StringFormat='${0:N2}'}" 
+                       FontSize="48" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+            
+            <Border Background="#252526" CornerRadius="5" Padding="10,5" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding PriceMultiplier, StringFormat='Potential: {0:N2}x'}" 
+                           Foreground="{Binding PriceMultiplier, Converter={x:Static vm:PriceColorConverter.Instance}}" 
+                           FontWeight="Bold"/>
+            </Border>
+
+            <Grid ColumnDefinitions="Auto, 20, Auto" HorizontalAlignment="Center" Margin="0,30,0,0">
+                <StackPanel>
+                    <TextBlock Text="{Binding SelectedCoinA.Name}" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    <TextBlock Text="{Binding SelectedCoinA.MarketCap, StringFormat='${0:N0}'}" Foreground="Gray" HorizontalAlignment="Right"/>
+                </StackPanel>
+                
+                <TextBlock Grid.Column="1" Text="VS" Foreground="#444" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="{Binding SelectedCoinB.Name}" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding SelectedCoinB.MarketCap, StringFormat='${0:N0}'}" Foreground="Gray"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+
+    </Grid>
+</UserControl>
