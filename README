@@ -1,10 +1,5 @@
 # Desktop Crypto Portfolio Tracker
 
-![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
-![AvaloniaUI](https://img.shields.io/badge/Avalonia_UI-Cross_Platform-B74624?style=for-the-badge)
-![SQLite](https://img.shields.io/badge/SQLite-Data-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
-
 **Desktop Crypto Portfolio Tracker** to wieloplatformowa aplikacja desktopowa do zarządzania i śledzenia wartości Twojego portfela kryptowalut. Aplikacja dostarcza aktualne dane rynkowe, pozwala prowadzić historię transakcji i generować raporty.
 
 ---
