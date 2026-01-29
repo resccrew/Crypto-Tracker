@@ -7,16 +7,17 @@ CREATE TABLE IF NOT EXISTS Users (
 );
 
 CREATE TABLE IF NOT EXISTS Coins (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     symbol TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
-    current_price REAL DEFAULT 0
+    current_price REAL DEFAULT 0,
+    image_url TEXT
 );
 
 CREATE TABLE IF NOT EXISTS Transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
-    coin_id INTEGER NOT NULL,
+    coin_id TEXT NOT NULL,
     type TEXT NOT NULL,  --(Buy or Sell)
     amount REAL NOT NULL,
     price_at_transaction REAL NOT NULL,

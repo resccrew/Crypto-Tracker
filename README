@@ -1,26 +1,70 @@
 # Desktop Crypto Portfolio Tracker
 
-Desktop to aplikacja do śledzenia wartości portfela inwestycyjnego kryptowalut.
-Umożliwia przeglądanie aktualnych kursów (COINGECKO API), prowadzenie ewidencji transakcji i generowanie raportów w formacie PDF.
+![.NET](https://img.shields.io/badge/.NET-9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![AvaloniaUI](https://img.shields.io/badge/Avalonia_UI-Cross_Platform-B74624?style=for-the-badge)
+![SQLite](https://img.shields.io/badge/SQLite-Data-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)
 
-** Technologie: * * C#. Net 9.0, Avalonia UI, SQLite, MVVM.
+**Desktop Crypto Portfolio Tracker** to wieloplatformowa aplikacja desktopowa do zarządzania i śledzenia wartości Twojego portfela kryptowalut. Aplikacja dostarcza aktualne dane rynkowe, pozwala prowadzić historię transakcji i generować raporty.
+
+---
+
+## Główne funkcje
+
+*  **Monitorowanie kursów:** Pobieranie aktualnych cen kryptowalut w czasie rzeczywistym poprzez **CoinGecko API**.
+*  **Zarządzanie portfelem:** Wygodne rejestrowanie transakcji (kupno/sprzedaż) i prowadzenie historii.
+*  **Analityka:** Podgląd bieżącej wartości aktywów i zmian w portfelu.
+*  **Raportowanie:** Generowanie szczegółowych raportów o stanie portfela w formacie **PDF**.
+*  **Lokalne przechowywanie:** Wszystkie dane są bezpiecznie przechowywane lokalnie w bazie danych **SQLite**.
+
+---
+
+##  Stos technologiczny
+
+Projekt został zbudowany przy użyciu nowoczesnych technologii .NET:
+
+* **Język:** C#
+* **Platforma:** .NET 9.0
+* **Framework UI:** Avalonia UI (zapewnia działanie na Windows, macOS, Linux)
+* **Baza danych:** SQLite
+* **Architektura:** MVVM (Model-View-ViewModel)
 
 ---
 
 ## Wymagania
 
-Przed uruchomieniem upewnij się, że masz zainstalowane:
-1.  ** IDE: * * JetBrains Rider lub Visual Studio 2022.
-2.  ** . NET SDK 9.0 * * (Sprawdź wersję ` 'dotnet -- version'`.
-3.  **Git**.
+Przed rozpoczęciem upewnij się, że masz zainstalowane:
+
+1.  **IDE:** [JetBrains Rider](https://www.jetbrains.com/rider/) lub [Visual Studio 2022](https://visualstudio.microsoft.com/).
+2.  **.NET SDK 9.0:**
+    * Wersję można sprawdzić poleceniem:
+        ```bash
+        dotnet --version
+        ```
+    * Można go pobrać [tutaj](https://dotnet.microsoft.com/download/dotnet/9.0).
+3.  **Git:** System kontroli wersji.
 
 ---
 
 ## Instalacja i uruchomienie
+
+Wykonaj poniższe kroki, aby uruchomić projekt lokalnie:
+
 ### 1. Klonowanie repozytorium
-Otwórz terminal i uruchom polecenie:
+Otwórz terminal i wykonaj polecenie:
+
 ```bash
 git clone [https://github.com/resccrew/Crypto-Tracker.git](https://github.com/resccrew/Crypto-Tracker.git)
 cd Crypto-Tracker
+
+### 2. Instalacja zależności
+
+Przywróć pakiety NuGet wymagane do działania projektu:
+
 dotnet restore
-dotnet run 
+
+### 3. Uruchomienie aplikacji
+
+Uruchom aplikację poleceniem:
+
+dotnet run
