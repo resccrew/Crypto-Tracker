@@ -24,7 +24,15 @@ public class CoinGeckoService
             string url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false";
             
             var coins = await _httpClient.GetFromJsonAsync<List<Coin>>(url);
-            return coins ?? new List<Coin>();
+            if (coins != null)
+            {
+                var db = new DatabaseService();
+                // Викликаємо асинхронний метод збереження
+                await db.SaveCoinsToDbAsync(coins);
+                
+                return coins;
+            }
+            return new List<Coin>();
         }
         catch (Exception ex)
         {

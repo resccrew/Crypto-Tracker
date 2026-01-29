@@ -2,6 +2,13 @@ using Microsoft.Data.Sqlite;
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
+using Desktop_Crypto_Portfolio_Tracker.Models;
+using System.Xml;
+using System.Collections.Generic;
+using System.IO;
+
+
 
 public class DatabaseService
 {
@@ -179,6 +186,92 @@ public class DatabaseService
 
     var result = cmd.ExecuteScalar();
     return result != null && Convert.ToInt32(result) == 1;
+    }
+    public async Task SaveCoinsToDbAsync(List<Coin> coins)
+    {
+        if (coins == null || coins.Count == 0) return;
+
+        try
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            // Активуємо підтримку Foreign Keys
+            using (var pragmaCmd = connection.CreateCommand())
+            {
+                pragmaCmd.CommandText = "PRAGMA foreign_keys = ON;";
+                await pragmaCmd.ExecuteNonQueryAsync();
+            }
+
+            using var transaction = connection.BeginTransaction();
+
+            foreach (var coin in coins)
+            {
+                if (string.IsNullOrEmpty(coin.Id)) continue;
+                
+                // Викликаємо допоміжний метод для кожної монети
+                await UpdateCoinDataAsync(connection, transaction, coin);
+            }
+
+            await transaction.CommitAsync();
+            System.Diagnostics.Debug.WriteLine($"БАЗА ДАНИХ: Успішно оновлено {coins.Count} монет.");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"ПОМИЛКА ПРИ ЗБЕРЕЖЕННІ СПИСКУ МОНЕТ: {ex.Message}");
+        }
+    }
+
+    private async Task UpdateCoinDataAsync(SqliteConnection connection, SqliteTransaction transaction, Coin coin)
+    {
+        double priceValue = (double)coin.Price;
+        const int MaxHistoryRecords = 100; // Ліміт записів історії для кожної монети
+
+        // 1. Оновлюємо поточну ціну (UPSERT)
+        var updateCmd = connection.CreateCommand();
+        updateCmd.Transaction = transaction;
+        updateCmd.CommandText = @"
+            INSERT INTO Coins (id, symbol, name, current_price)
+            VALUES (@id, @symbol, @name, @price)
+            ON CONFLICT(id) DO UPDATE SET 
+                current_price = excluded.current_price,
+                symbol = excluded.symbol,
+                name = excluded.name;";
+
+        updateCmd.Parameters.AddWithValue("@id", coin.Id);
+        updateCmd.Parameters.AddWithValue("@symbol", coin.Symbol ?? "");
+        updateCmd.Parameters.AddWithValue("@name", coin.Name ?? "");
+        updateCmd.Parameters.AddWithValue("@price", priceValue);
+        await updateCmd.ExecuteNonQueryAsync();
+
+        // 2. Додаємо новий запис в історію
+        var historyCmd = connection.CreateCommand();
+        historyCmd.Transaction = transaction;
+        historyCmd.CommandText = @"
+            INSERT INTO Price_History (coin_id, price)
+            VALUES (@coin_id, @price)";
+
+        historyCmd.Parameters.AddWithValue("@coin_id", coin.Id);
+        historyCmd.Parameters.AddWithValue("@price", priceValue);
+        await historyCmd.ExecuteNonQueryAsync();
+
+        // 3. ОЧИЩЕННЯ: Видаляємо найстаріші записи, якщо їх більше ніж MaxHistoryRecords
+        // Цей запит видаляє всі записи для цієї монети, крім останніх N
+        var cleanupCmd = connection.CreateCommand();
+        cleanupCmd.Transaction = transaction;
+        cleanupCmd.CommandText = @"
+            DELETE FROM Price_History 
+            WHERE coin_id = @coin_id 
+            AND id NOT IN (
+                SELECT id FROM Price_History 
+                WHERE coin_id = @coin_id 
+                ORDER BY timestamp DESC 
+                LIMIT @limit
+            );";
+
+        cleanupCmd.Parameters.AddWithValue("@coin_id", coin.Id);
+        cleanupCmd.Parameters.AddWithValue("@limit", MaxHistoryRecords);
+        await cleanupCmd.ExecuteNonQueryAsync();
     }
 
 }
