@@ -2,6 +2,13 @@ using Microsoft.Data.Sqlite;
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
+using Desktop_Crypto_Portfolio_Tracker.Models;
+using System.Xml;
+using System.Collections.Generic;
+using System.IO;
+
+
 
 public class DatabaseService
 {
@@ -179,6 +186,46 @@ public class DatabaseService
 
     var result = cmd.ExecuteScalar();
     return result != null && Convert.ToInt32(result) == 1;
+    }
+    public async Task SaveCoinsToDbAsync(List<Coin> coins)
+    {
+        if (coins == null || coins.Count == 0) return;
+
+        try
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var transaction = connection.BeginTransaction();
+            var command = connection.CreateCommand();
+            command.Transaction = transaction;
+
+            command.CommandText = @"
+                INSERT OR REPLACE INTO Coins (id, symbol, name, current_price)
+                VALUES (@id, @symbol, @name, @price)";
+
+            var pId = command.Parameters.Add("@id", SqliteType.Text);
+            var pSymbol = command.Parameters.Add("@symbol", SqliteType.Text);
+            var pName = command.Parameters.Add("@name", SqliteType.Text);
+            var pPrice = command.Parameters.Add("@price", SqliteType.Real);
+
+            foreach (var coin in coins)
+            {
+                pId.Value = coin.Id ?? (object)DBNull.Value;
+                pSymbol.Value = coin.Symbol ?? "";
+                pName.Value = coin.Name ?? "";
+                pPrice.Value = (double)coin.Price;
+
+                await command.ExecuteNonQueryAsync();
+            }
+
+            await transaction.CommitAsync();
+            System.Diagnostics.Debug.WriteLine($"БАЗА ДАНИХ: Асинхронно оновлено {coins.Count} монет.");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"ПОМИЛКА АСИНХРОННОГО ЗБЕРЕЖЕННЯ: {ex.Message}");
+        }
     }
 
 }
