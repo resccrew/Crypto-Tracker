@@ -9,7 +9,7 @@ public class EmailService
     private readonly string _smtpHost = "smtp.gmail.com";
     private readonly int _smtpPort = 587;
 
-    // TODO: впиши свої дані
+
     private readonly string _smtpUser = "zizzo2006@gmail.com";
     private readonly string _smtpPass = "tkcqufibmspkvgpl";
 
