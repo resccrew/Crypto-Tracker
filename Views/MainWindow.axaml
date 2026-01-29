@@ -27,8 +27,7 @@
             <Setter Property="Foreground" Value="#666666"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Margin" Value="0"/>
-            <Setter Property="Padding" Value="25,10"/>
-            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="20,10"/> <Setter Property="CornerRadius" Value="0"/>
             <Setter Property="MinHeight" Value="40"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -52,6 +51,30 @@
         <Style Selector="TabItem:focus /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="FocusAdorner" Value="{x:Null}"/>
         </Style>
+
+        <Style Selector="Button.LogoutStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#666666"/>
+            <Setter Property="BorderBrush" Value="#333333"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="20,8"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.2"/>
+                    <BrushTransition Property="Foreground" Duration="0:0:0.2"/>
+                    <BrushTransition Property="Background" Duration="0:0:0.2"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.LogoutStyle:pointerover">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="Background" Value="#111111"/>
+        </Style>
     </Window.Styles>
 
     <Grid>
@@ -62,58 +85,53 @@
             </RadialGradientBrush>
         </Grid.Background>
 
-        <Grid RowDefinitions="Auto, *">
+        <TabControl Margin="0,40,0,0" Padding="0">
+            <TabControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" 
+                                HorizontalAlignment="Center" 
+                                Background="Transparent"
+                                PointerPressed="OnPointerPressed"/>
+                </ItemsPanelTemplate>
+            </TabControl.ItemsPanel>
+
+            <TabItem Header="Market">
+                <Border Padding="30,10">
+                    <views:MarketView/>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Portfolio">
+                <Border Padding="30,10">
+                    <views:PortfolioView/>
+                </Border>
+            </TabItem>
+
+            <TabItem Header="Comparator">
+                <Border Padding="30,10">
+                    <views:ComparisonView/>
+                </Border>
+            </TabItem>
+        </TabControl>
+
+        <Grid VerticalAlignment="Top" Margin="30,40,30,0" Height="40" ColumnDefinitions="Auto, *, Auto">
             
-            <Grid Grid.Row="0" Margin="30,40,30,20">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <TextBlock Text="CRYPTO" FontWeight="Bold" FontSize="16" Foreground="White" LetterSpacing="1"/>
-                    <TextBlock Text="TRACKER" FontWeight="Regular" FontSize="16" Foreground="#666666" LetterSpacing="1" Margin="5,0,0,0"/>
-                </StackPanel>
+            <StackPanel Grid.Column="0" 
+                        Orientation="Horizontal" 
+                        VerticalAlignment="Center" 
+                        Background="Transparent"
+                        PointerPressed="OnPointerPressed">
+                <TextBlock Text="CRYPTO" FontWeight="Bold" FontSize="16" Foreground="White" LetterSpacing="1"/>
+                <TextBlock Text="TRACKER" FontWeight="Regular" FontSize="16" Foreground="#666666" LetterSpacing="1" Margin="5,0,0,0"/>
+            </StackPanel>
 
-                <Button Grid.Column="1"
-                Content="Logout"
-                Click="OnLogoutClick"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Right"
-                Padding="18,8"
-                Background="#222222"
-                Foreground="White"
-                BorderBrush="#444444"
-                BorderThickness="1"
-                CornerRadius="6"
-                Cursor="Hand"/>
-                
-            </Grid>
+            <Panel Grid.Column="1" IsHitTestVisible="False"/>
 
-            <TabControl Grid.Row="1"  Margin="0,40,0,0" Padding="0">
-                
-                <TabControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" 
-                                    HorizontalAlignment="Center" 
-                                    Margin="0,0,0,20" 
-                                    Background="Transparent"/>
-                    </ItemsPanelTemplate>
-                </TabControl.ItemsPanel>
-
-                <TabItem Header="Market">
-                    <Border Padding="30,10">
-                        <views:MarketView/>
-                    </Border>
-                </TabItem>
-
-                <TabItem Header="Portfolio">
-                    <Border Padding="30,10">
-                        <views:PortfolioView/>
-                    </Border>
-                </TabItem>
-
-                <TabItem Header="Comparator" FontSize="16" FontWeight="Bold">
-                    <Border Padding="30,10">
-                        <views:ComparisonView/>
-                    </Border>
-                </TabItem>
-            </TabControl>
+            <Button Grid.Column="2"
+                    Classes="LogoutStyle"
+                    Content="LOGOUT"
+                    Click="OnLogoutClick"/>
         </Grid>
+
     </Grid>
 </Window>

@@ -1,7 +1,8 @@
 using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
+using Avalonia.Input; // Нужно для перетаскивания
 using Desktop_Crypto_Portfolio_Tracker.ViewModels;
 using System.Linq;
 
@@ -15,54 +16,62 @@ public partial class MainWindow : Window
         DataContext = new MainWindowViewModel();
     }
 
-    // Додавання транзакції
+    // ПЕРЕМЕЩЕНИЕ ОКНА
+    private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        BeginMoveDrag(e);
+    }
+
+    // Добавление транзакции
     private async void OnAddTransactionClick(object? sender, RoutedEventArgs e)
     {
         if (DataContext is MainWindowViewModel viewModel)
         {
             var availableCoins = viewModel.MarketCoins.ToList();
             var dialog = new AddTransactionWindow(availableCoins);
+            
+            // 👇 СТРОГО ИСПОЛЬЗУЕМ PortfolioDisplayItem (старый тип)
             var result = await dialog.ShowDialog<PortfolioDisplayItem>(this);
 
             if (result != null)
             {
                 viewModel.MyPortfolio.Add(result);
-                viewModel.RecalculateBalance(); // Оновлюємо суму
-            }
-        }
-    }
-
-    // 👇 Логіка видалення
-    private void OnDeleteClick(object? sender, RoutedEventArgs e)
-    {
-        // 1. Отримуємо кнопку, на яку натиснули
-        var button = sender as Button;
-        
-        // 2. Дізнаємось, до якого запису (рядка) вона належить
-        if (button?.DataContext is PortfolioDisplayItem itemToDelete)
-        {
-            if (DataContext is MainWindowViewModel viewModel)
-            {
-                // 3. Видаляємо цей запис зі списку
-                viewModel.MyPortfolio.Remove(itemToDelete);
-                
-                // 4. Перераховуємо баланс
                 viewModel.RecalculateBalance();
             }
         }
     }
 
-    private void OnLogoutClick(object? sender, RoutedEventArgs e)
-{
-    if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+    // Удаление транзакции
+    private void OnDeleteClick(object? sender, RoutedEventArgs e)
     {
-        // відкриваємо вікно авторизації
-        var loginWindow = new LoginWindow();
-        desktop.MainWindow = loginWindow;
-        loginWindow.Show();
+        var button = sender as Button;
+        
+        // 👇 СТРОГО ИСПОЛЬЗУЕМ PortfolioDisplayItem (старый тип)
+        if (button?.DataContext is PortfolioDisplayItem itemToDelete)
+        {
+            if (DataContext is MainWindowViewModel viewModel)
+            {
+                viewModel.MyPortfolio.Remove(itemToDelete);
+                viewModel.RecalculateBalance();
+            }
+        }
     }
 
-    // закриваємо поточне головне вікно
-    Close();
-}
+    // Логика выхода (Logout)
+    private void OnLogoutClick(object? sender, RoutedEventArgs e)
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            var loginWindow = new LoginWindow();
+            desktop.MainWindow = loginWindow;
+            loginWindow.Show();
+        }
+
+        Close();
+    }
+    
+    // Заглушка для печати
+    private void OnPrintClick(object? sender, RoutedEventArgs e)
+    {
+    }
 }
