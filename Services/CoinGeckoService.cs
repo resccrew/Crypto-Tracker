@@ -27,7 +27,7 @@ public class CoinGeckoService
             if (coins != null)
             {
                 var db = new DatabaseService();
-                // Викликаємо асинхронний метод збереження
+                
                 await db.SaveCoinsToDbAsync(coins);
                 
                 return coins;
