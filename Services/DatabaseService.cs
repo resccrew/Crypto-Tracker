@@ -13,7 +13,7 @@ using Desktop_Crypto_Portfolio_Tracker.ViewModels;
 
 public class DatabaseService
 {
-    // Використовуйте крапку для поточного каталогу, якщо база поруч з .exe
+   
     private string _connectionString = "Data Source=database.db"; 
 
     public DatabaseService()
@@ -33,7 +33,7 @@ public class DatabaseService
             command.CommandText = "SELECT COUNT(*) FROM Users WHERE email = @email";
             command.Parameters.AddWithValue("@email", email);
 
-            // ВИПРАВЛЕНО: Безпечне отримання значення
+            
             var result = command.ExecuteScalar();
             long count = result != null ? Convert.ToInt64(result) : 0;
             return count > 0;
@@ -135,7 +135,7 @@ public class DatabaseService
     using var connection = new SqliteConnection(_connectionString);
     connection.Open();
 
-    // 1) дістаємо очікуваний хеш і дедлайн
+    
     var cmd = connection.CreateCommand();
     cmd.CommandText = @"
         SELECT email_verification_code_hash, email_verification_expires_at, email_verified
@@ -163,7 +163,7 @@ public class DatabaseService
     if (storedHash != codeHash)
         return false;
 
-    // 2) підтверджуємо email
+   
     var upd = connection.CreateCommand();
     upd.CommandText = @"
         UPDATE Users
@@ -197,7 +197,7 @@ public class DatabaseService
             using var connection = new SqliteConnection(_connectionString);
             await connection.OpenAsync();
 
-            // Активуємо підтримку Foreign Keys
+           
             using (var pragmaCmd = connection.CreateCommand())
             {
                 pragmaCmd.CommandText = "PRAGMA foreign_keys = ON;";
@@ -210,7 +210,7 @@ public class DatabaseService
             {
                 if (string.IsNullOrEmpty(coin.Id)) continue;
                 
-                // Викликаємо допоміжний метод для кожної монети
+                
                 await UpdateCoinDataAsync(connection, transaction, coin);
             }
 
@@ -226,9 +226,9 @@ public class DatabaseService
     private async Task UpdateCoinDataAsync(SqliteConnection connection, SqliteTransaction transaction, Coin coin)
     {
         double priceValue = (double)coin.Price;
-        const int MaxHistoryRecords = 100; // Ліміт записів історії для кожної монети
+        const int MaxHistoryRecords = 100; 
 
-        // 1. Оновлюємо поточну ціну (UPSERT)
+        
         var updateCmd = connection.CreateCommand();
         updateCmd.Transaction = transaction;
         updateCmd.CommandText = @"
@@ -238,16 +238,16 @@ public class DatabaseService
                 current_price = excluded.current_price,
                 symbol = excluded.symbol,
                 name = excluded.name,
-                image_url = excluded.image_url;"; // Оновлюємо картинку
+                image_url = excluded.image_url;"; 
 
         updateCmd.Parameters.AddWithValue("@id", coin.Id);
         updateCmd.Parameters.AddWithValue("@symbol", coin.Symbol ?? "");
         updateCmd.Parameters.AddWithValue("@name", coin.Name ?? "");
         updateCmd.Parameters.AddWithValue("@price", (double)coin.Price);
-        updateCmd.Parameters.AddWithValue("@img", coin.ImageUrl ?? (object)DBNull.Value); // Записуємо ImageUrl
+        updateCmd.Parameters.AddWithValue("@img", coin.ImageUrl ?? (object)DBNull.Value); 
         await updateCmd.ExecuteNonQueryAsync();
 
-        // 2. Додаємо новий запис в історію
+      
         var historyCmd = connection.CreateCommand();
         historyCmd.Transaction = transaction;
         historyCmd.CommandText = @"
@@ -258,8 +258,7 @@ public class DatabaseService
         historyCmd.Parameters.AddWithValue("@price", priceValue);
         await historyCmd.ExecuteNonQueryAsync();
 
-        // 3. ОЧИЩЕННЯ: Видаляємо найстаріші записи, якщо їх більше ніж MaxHistoryRecords
-        // Цей запит видаляє всі записи для цієї монети, крім останніх N
+    
         var cleanupCmd = connection.CreateCommand();
         cleanupCmd.Transaction = transaction;
         cleanupCmd.CommandText = @"
@@ -349,7 +348,7 @@ public class DatabaseService
                     DbId = reader.GetInt64(0),
                     CoinId = reader.IsDBNull(1) ? "" : reader.GetString(1),
                     Name = reader.IsDBNull(2) ? "Unknown" : reader.GetString(2),
-                    // Безпечне приведення типів
+               
                     Amount = Convert.ToDecimal(reader.GetValue(3)),
                     Price = reader.IsDBNull(4) ? 0 : Convert.ToDecimal(reader.GetValue(4)),
                     Symbol = reader.IsDBNull(5) ? "" : reader.GetString(5),
