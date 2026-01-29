@@ -26,7 +26,6 @@ public class RegisterViewModel : INotifyPropertyChanged
     public ICommand RegisterCommand { get; }
     public ICommand BackToLoginCommand { get; }
 
-    // userId + email -> для переходу на Verify
     public event Action<long, string>? VerificationRequired;
 
     public event Action? BackToLoginRequested;
@@ -57,35 +56,35 @@ public class RegisterViewModel : INotifyPropertyChanged
 
             if (_db.UserExists(Email))
             {
-                Error = "Користувач з таким email вже існує.";
+                Error = "User with the same email already exists.";
                 return;
             }
 
-            // 2FA: генеруємо код
+
             var code = GenerateCode();
             var codeHash = Hash(code);
             var expiresAtUtc = DateTime.UtcNow.AddMinutes(10);
 
             try
             {
-                // створюємо користувача як "не підтверджений"
+
                 var userId = _db.RegisterUserPendingVerification(Email, Password, codeHash, expiresAtUtc);
                 if (userId <= 0)
                 {
-                    Error = "Не вдалося створити користувача.";
+                    Error = "Failed to create a new user.";
                     return;
                 }
 
-                // відправляємо код на email
+                
                 _emailService.SendVerificationCode(Email, code);
 
-                // переходимо на Verify
+                
                 VerificationRequired?.Invoke(userId, Email);
             }
             catch (Exception ex)
             {
-                Error = "Помилка реєстрації/відправки коду.";
-                Error = ex.Message; // ⬅️ ПОКАЖЕ РЕАЛЬНУ ПОМИЛКУ
+                Error = "Registration failed.";
+                Error = ex.Message; 
                 System.Diagnostics.Debug.WriteLine(ex);
             }
         });
@@ -95,7 +94,7 @@ public class RegisterViewModel : INotifyPropertyChanged
 
     private static string GenerateCode()
     {
-        // 6 цифр
+        
         var n = RandomNumberGenerator.GetInt32(0, 1_000_000);
         return n.ToString("D6");
     }
