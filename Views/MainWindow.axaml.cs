@@ -1,3 +1,5 @@
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Desktop_Crypto_Portfolio_Tracker.ViewModels;
@@ -49,4 +51,18 @@ public partial class MainWindow : Window
             }
         }
     }
+
+    private void OnLogoutClick(object? sender, RoutedEventArgs e)
+{
+    if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+    {
+        // відкриваємо вікно авторизації
+        var loginWindow = new LoginWindow();
+        desktop.MainWindow = loginWindow;
+        loginWindow.Show();
+    }
+
+    // закриваємо поточне головне вікно
+    Close();
+}
 }
