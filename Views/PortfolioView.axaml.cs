@@ -29,57 +29,58 @@ namespace Desktop_Crypto_Portfolio_Tracker.Views
                 
                 if (topLevel != null)
                 {
-                    // Отримуємо нову транзакцію від користувача
                     var result = await dialog.ShowDialog<PortfolioDisplayItem>(topLevel);
                     
                     if (result != null)
                     {
-                        // 👇 ГОЛОВНА ЛОГІКА ПЕРЕВІРКИ 👇
+                        var db = new DatabaseService();
+                        // userId = 1 for testing
+                        long newDbId = await db.AddTransactionAsync(1, result.CoinId ?? "", "Buy", (double)result.Amount, (double)result.Price);
                         
-                        // Шукаємо, чи є вже така монета в портфоліо
-                        var existingItem = viewModel.MyPortfolio.FirstOrDefault(x => x.Name == result.Name);
-
-                        if (existingItem != null)
+                        if (newDbId > 0)
                         {
-                            // === ВАРІАНТ А: Монета вже є -> Оновлюємо її ===
+                            result.DbId = newDbId;
                             
-                            // 1. Рахуємо нову середню ціну (Weighted Average)
-                            // Формула: (СтараСума + НоваСума) / ЗагальнаКількість
-                            decimal totalCostOld = existingItem.Price * existingItem.Amount;
-                            decimal totalCostNew = result.Price * result.Amount;
-                            decimal newTotalAmount = existingItem.Amount + result.Amount;
+                            var existingItem = viewModel.MyPortfolio.FirstOrDefault(x => x.Name == result.Name);
 
-                            if (newTotalAmount > 0)
+                            if (existingItem != null)
                             {
-                                existingItem.Price = (totalCostOld + totalCostNew) / newTotalAmount;
+                                // Weighted Average Calculation
+                                decimal totalCostOld = existingItem.Price * existingItem.Amount;
+                                decimal totalCostNew = result.Price * result.Amount;
+                                decimal newTotalAmount = existingItem.Amount + result.Amount;
+
+                                if (newTotalAmount > 0)
+                                {
+                                    existingItem.Price = (totalCostOld + totalCostNew) / newTotalAmount;
+                                }
+
+                                existingItem.Amount = newTotalAmount;
+                            }
+                            else
+                            {
+                                viewModel.MyPortfolio.Add(result);
                             }
 
-                            // 2. Додаємо кількість
-                            existingItem.Amount = newTotalAmount;
-                            
-                            // (TotalValue перерахується автоматично завдяки змінам у ViewModel)
+                            viewModel.RecalculateBalance();
                         }
-                        else
-                        {
-                            // === ВАРІАНТ Б: Це нова монета -> Додаємо в список ===
-                            viewModel.MyPortfolio.Add(result);
-                        }
-
-                        // Оновлюємо загальний баланс вгорі екрану
-                        viewModel.RecalculateBalance();
                     }
                 }
             }
         }
 
-        private void OnDeleteClick(object? sender, RoutedEventArgs e)
+        private async void OnDeleteClick(object? sender, RoutedEventArgs e)
         {
             if (sender is Button button && 
                 button.DataContext is PortfolioDisplayItem itemToDelete &&
                 DataContext is MainWindowViewModel viewModel)
             {
-                viewModel.MyPortfolio.Remove(itemToDelete);
-                viewModel.RecalculateBalance();
+                var db = new DatabaseService();
+                if (await db.DeleteTransactionAsync(itemToDelete.DbId))
+                {
+                    viewModel.MyPortfolio.Remove(itemToDelete);
+                    viewModel.RecalculateBalance();
+                }
             }
         }
 
@@ -128,7 +129,6 @@ namespace Desktop_Crypto_Portfolio_Tracker.Views
                         .Column(x =>
                         {
                             x.Item().Text($"Date: {DateTime.Now:g}");
-                            // N2 format + manual $ sign
                             x.Item().Text($"Total Balance: ${viewModel.TotalBalance:N2}").Bold().FontSize(16).FontColor(Colors.Green.Medium);
                             
                             x.Item().PaddingVertical(10).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
